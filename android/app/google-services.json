@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "956784528470",
+    "project_id": "agentswipe-d9e32",
+    "storage_bucket": "agentswipe-d9e32.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956784528470:android:3b20750d097386cb7e7ff7",
+        "android_client_info": {
+          "package_name": "com.example.propmeet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956784528470-7k8sf08o9sp8lk1m3jrotnslfo7ags9n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZJfmG6TTq_jCkZoef7am3LD8ZxxxiJEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956784528470-7k8sf08o9sp8lk1m3jrotnslfo7ags9n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

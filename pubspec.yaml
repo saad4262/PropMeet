@@ -37,6 +37,14 @@ dependencies:
   get: ^4.7.2
   connectivity_plus: ^6.1.4
   http: ^1.4.0
+  firebase_core: ^4.0.0
+  firebase_storage: ^13.0.0
+  cloud_firestore: ^6.0.0
+  firebase_auth: ^6.0.0
+
+
+
+
 
 
 
