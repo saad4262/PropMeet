@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart'; 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:propmeet/shared/utils/responsive_utils.dart'; 
 import 'firebase_options.dart'; 
 import 'package:propmeet/shared/themes/app_theme.dart';
 import 'core/routes/app_pages.dart';
@@ -18,12 +19,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Responsive.init(context);
     return GetMaterialApp(
       title: 'PropMeet',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
     );
   }
