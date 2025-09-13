@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:propmeet/core/routes/app_routes.dart';
 
 class OnboardingController extends GetxController {
   var pageIndex = 0.obs;
@@ -7,11 +8,11 @@ class OnboardingController extends GetxController {
     if (pageIndex.value < 2) {
       pageIndex.value++;
     } else {
-      Get.offNamed('/home');
+      Get.offNamed(AppRoutes.loginOptionView);
     }
   }
 
   void skip() {
-    Get.offNamed('/home');
+    Get.offNamed(AppRoutes.loginView);
   }
 }

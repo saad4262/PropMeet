@@ -1,7 +1,11 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:propmeet/core/bindings/auth_bindings/login_option_bindings.dart';
+import 'package:propmeet/core/bindings/auth_bindings/login_view_bindings.dart';
 import 'package:propmeet/core/bindings/onBarding_binding.dart';
 import 'package:propmeet/core/bindings/splash_bindings.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
+import 'package:propmeet/presentation/views/auth_view/login_option_views.dart';
+import 'package:propmeet/presentation/views/auth_view/login_view.dart';
 import 'package:propmeet/presentation/views/onboarding_screen.dart';
 import 'package:propmeet/presentation/views/splash_screen.dart';
 
@@ -17,6 +21,16 @@ class AppPages {
       name: AppRoutes.onBoarding,
       page: () => OnboardingScreen(),
       binding: OnBoardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.loginOptionView,
+      page: () => LoginOptionViews(),
+      binding: LoginOptionBindings(),
+    ),
+    GetPage(
+      name: AppRoutes.loginView,
+      page: () => LoginView(),
+      binding: LoginViewBindings()
     ),
   ];
 }
