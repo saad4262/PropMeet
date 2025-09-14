@@ -20,7 +20,6 @@ class SplashScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: Responsive.height(10)),
-
             SvgPicture.asset(AppImages.logo, height: Responsive.height(60)),
             SizedBox(height: Responsive.height(5)),
             Lottie.asset(AppImages.loading, height: Responsive.height(13)),
