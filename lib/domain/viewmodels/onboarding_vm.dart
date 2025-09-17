@@ -8,11 +8,11 @@ class OnboardingController extends GetxController {
     if (pageIndex.value < 2) {
       pageIndex.value++;
     } else {
-      Get.offNamed(AppRoutes.loginOptionView);
+      Get.offNamed(AppRoutes.signUp);
     }
   }
 
   void skip() {
-    Get.offNamed(AppRoutes.loginView);
+    Get.offNamed(AppRoutes.signUp);
   }
 }
