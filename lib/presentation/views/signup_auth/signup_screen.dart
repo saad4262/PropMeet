@@ -315,7 +315,7 @@ class _SignupViewState extends State<SignupView> {
                                         authController.isLoading.value = false;
 
                                         if (success) {
-                                          Get.offAllNamed(AppRoutes.home);
+                                          Get.offAllNamed(AppRoutes.bottomBarView);
                                         }
                                       }
                                     },

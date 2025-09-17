@@ -4,5 +4,14 @@ abstract class AppRoutes {
   static const signUp = '/signUp';
   static const login = '/login';
   static const login2 = '/login2';
+
+  //user side view
+
+  static const bottomBarView='/bottomBarView';
   static const home = '/home';
+  static const chatView='/chatView';
+  static const topAgentView='/topAgentView';
+  static const favouriteView='/favouriteView';
+  static const userProfileView='/userProfileView';
+
 }

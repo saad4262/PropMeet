@@ -77,7 +77,7 @@ class LoginView2 extends StatelessWidget {
                                         authController.isLoading.value = false;
 
                                         if (success) {
-                                          Get.offAllNamed(AppRoutes.home);
+                                          Get.offAllNamed(AppRoutes.bottomBarView);
                                         } else {
                                           Get.snackbar("Error", "Login failed");
                                         }
@@ -174,7 +174,7 @@ class LoginView2 extends StatelessWidget {
                                         authController.isLoading.value = false;
 
                                         if (success) {
-                                          Get.offAllNamed(AppRoutes.home);
+                                          Get.offAllNamed(AppRoutes.bottomBarView);
                                         } else {
                                           Get.snackbar("Error", "Login failed");
                                         }
