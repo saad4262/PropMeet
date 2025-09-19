@@ -11,7 +11,7 @@ import '../../../domain/viewmodels/bottom_bar_controller/bottom_bar_controller.d
 import '../../../shared/config/app_assets/app_assets.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/utils/responsive_utils.dart';
-import '../user_side_views/home_view/home.dart';
+import '../user_side_views/home_view/home_view.dart';
 
 class BottomBarView extends StatefulWidget {
   const BottomBarView({super.key});
@@ -52,10 +52,6 @@ class _BottomBarViewState extends State<BottomBarView> {
             height: Responsive.height(10),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(Responsive.radius(4)),
-                topRight: Radius.circular(Responsive.radius(4)),
-              ),
             ),
             child: Obx(
               () => Column(

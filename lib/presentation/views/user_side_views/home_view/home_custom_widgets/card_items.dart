@@ -1,9 +1,14 @@
-import 'package:custom_cached_image/custom_cached_image_with_shimmer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:propmeet/shared/constants/app_colors.dart';
+
+import '../../../../../shared/config/app_assets/app_assets.dart';
+import '../../../../../shared/constants/app_colors.dart';
+import '../../../../../shared/utils/responsive_utils.dart';
+import 'card_profile_widgets.dart';
 
 class CardItem extends StatelessWidget {
   final String name;
+  final String distance;
   final String imagePath;
   final double progress;
   final bool isLiked;
@@ -21,81 +26,108 @@ class CardItem extends StatelessWidget {
     required this.swipedCardName,
     Key? key,
     required this.previewAction,
-    required this.previewName,
+    required this.previewName, required this.distance,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Card(
+      elevation: 3,
+      color: AppColors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [BoxShadow(blurRadius: 5, color: Colors.black26)],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Expanded(
-            flex: 5,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-              ),
-              child: Image.network(
-                 imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity, height: 50,
-              ),
+            flex: 4,
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.cover,
+              width: double.infinity,
             ),
           ),
 
           Expanded(
             flex: 5,
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  LinearProgressIndicator(
-                    borderRadius: BorderRadius.circular(20),
-                    value: progress,
-                    minHeight: 6,
-                    backgroundColor: Colors.grey[300],
-                    color: Colors.blueAccent,
-                  ),
-                  const SizedBox(height: 10),
-
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         name,
-                        style:  TextStyle(
-                          fontSize: 20,
-                          color: AppColors.black,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text(
-                        "4km",
-                        style: TextStyle(fontSize: 12,  color: AppColors.grey,),
-                      ),
+                      const SizedBox(width: 6),
+                      Image.asset(AppAssets.verifiedIcon, width: 18),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
+                  Text(
+                    "$distance km away",
+                    style: TextStyle(
+                      fontSize: Responsive.fontSize(4),
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
 
-                  const Text("Teacher • Any bio/description", style: TextStyle(fontSize: 10, color: AppColors.black,),),
+                  Expanded(
+                    child: GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 1.2,
+                      children: [
+                        CardProfileWidgets(
+                          title: 'Experience',
+                          subtitle: '5+ years',
+                          icon: Icons.work,
+                          iconColor: AppColors.black,
+                        ),
+                        CardProfileWidgets(),
+                        CardProfileWidgets(
+                          title: 'Rating',
+                          subtitle: '4.8',
+                          icon: Icons.star,
+                          iconColor: Colors.yellow,
+                        ),
+                        CardProfileWidgets(
+                          title: 'Location',
+                          subtitle: 'NY, USA',
+                          icon: Icons.location_on,
+                          iconColor: Colors.black,
+                        ),
+                        CardProfileWidgets(
+                          title: 'Agency',
+                          subtitle: 'ABC Realty',
+                          icon: Icons.apartment,
+                          iconColor: AppColors.black,
+                        ),
+                        CardProfileWidgets(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
+          )
         ],
       ),
     );
   }
 }
+
 
 enum SwipeAction { none, like, dislike }

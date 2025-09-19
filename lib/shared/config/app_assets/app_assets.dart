@@ -11,7 +11,10 @@ class AppAssets{
   static const String appIconLogo='/$imagesPath/logo2.svg';
 
   //png images
-
-
+  static const String verifiedIcon="$imagesPath/verified_icon.png";
+  static const String user1="$imagesPath/user1.png";
+  static const String user2="$imagesPath/user2.png";
+  static const String user3="$imagesPath/user3.png";
+  static const String user4="$imagesPath/user4.png";
 
 }

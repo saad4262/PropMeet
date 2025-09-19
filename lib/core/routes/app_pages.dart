@@ -22,7 +22,7 @@ import 'package:propmeet/presentation/views/user_side_views/favourites_view/favo
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
 
-import '../../presentation/views/user_side_views/home_view/home.dart';
+import '../../presentation/views/user_side_views/home_view/home_view.dart';
 
 class AppPages {
   static final routes = [

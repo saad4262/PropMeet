@@ -1,10 +1,17 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
+import 'package:propmeet/shared/config/app_assets/app_assets.dart';
 
 import '../../../../presentation/views/user_side_views/home_view/home_custom_widgets/card_items.dart';
+import '../favourites_view_controller/favourite_view_controller.dart';
 
 class HomeController extends GetxController {
+
+  final FavouriteViewController favouriteController = Get.find();
+
   final CardSwiperController swiperController = CardSwiperController();
   final RxInt currentIndex = 0.obs;
   final RxDouble progress = 0.0.obs;
@@ -12,18 +19,20 @@ class HomeController extends GetxController {
   late Timer _progressTimer;
 
   final List<Map<String, String>> allUsers = [
-    {'name': 'Ahmad', 'image': 'https://randomuser.me/api/portraits/men/32.jpg'},
-    {'name': 'Ali', 'image': 'https://randomuser.me/api/portraits/men/41.jpg'},
-    {'name': 'Charlie', 'image': 'https://randomuser.me/api/portraits/men/65.jpg'},
-    {'name': 'Ping', 'image': 'https://randomuser.me/api/portraits/women/21.jpg'},
-    {'name': 'Flying Man', 'image': 'https://randomuser.me/api/portraits/men/83.jpg'},
-    {'name': 'Adele', 'image': 'https://randomuser.me/api/portraits/women/50.jpg'},
-    {'name': 'Naina', 'image': 'https://randomuser.me/api/portraits/women/44.jpg'},
-    {'name': 'Sally', 'image': 'https://randomuser.me/api/portraits/women/62.jpg'},
+    {'name': 'Ahmad', 'image': AppAssets.user1, 'distance': '13'},
+    {'name': 'Ali', 'image':  AppAssets.user2,'distance': '2'},
+    {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '130'},
+    {'name': 'Ping', 'image':  AppAssets.user4,'distance': '120'},
+    {'name': 'Ahmad', 'image': AppAssets.user1,'distance': '22'},
+    {'name': 'Ali', 'image':  AppAssets.user2,'distance': '11'},
+    {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '13'},
+    {'name': 'Ping', 'image':  AppAssets.user4,'distance': '223'},
   ];
 
   final RxList<Map<String, String>> currentCards = <Map<String, String>>[].obs;
   final RxSet<String> likedNames = <String>{}.obs;
+
+  final RxBool isLoading = true.obs;
 
   final RxBool showRefresh = false.obs;
 
@@ -43,7 +52,11 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    startProgressTimer(); // Start for the first card
+    Future.delayed(const Duration(seconds: 5), () {
+      isLoading.value = false;
+    });
+
+    startProgressTimer();
   }
 
   void shuffleUsers() {
@@ -63,7 +76,7 @@ class HomeController extends GetxController {
     _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (progress.value >= 1.0) {
         timer.cancel();
-        autoSwipeLeft();
+    //    autoSwipeLeft();
       } else {
         progress.value += 0.01;
       }
@@ -78,24 +91,25 @@ class HomeController extends GetxController {
     }
   }
 
-  bool onSwipe(
-      int previousIndex,
-      int? currentIndex,
-      CardSwiperDirection direction,
-      ) {
+
+  @override
+  bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer.cancel();
 
     final swipedUser = currentCards[previousIndex];
     this.currentIndex.value = currentIndex ?? previousIndex;
-
     swipedCardName.value = swipedUser['name']!;
 
     if (direction == CardSwiperDirection.right) {
       likedNames.add(swipedUser['name']!);
       swipeAction.value = SwipeAction.like;
-      showSnackBar(swipedUser['name']!);
+
+      favouriteController.addToFavourites(swipedUser);
+
+      showSnackBar(swipedUser['name']!, action: "like");
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
+      showSnackBar(swipedUser['name']!, action: "dislike");
     }
 
     Future.delayed(const Duration(milliseconds: 400), () {
@@ -112,6 +126,7 @@ class HomeController extends GetxController {
     return true;
   }
 
+
   void updateSwipePreview(double percentX, String cardName) {
     if (percentX >= 0.2) {
       swipePreviewDirection.value = SwipeAction.like;
@@ -125,15 +140,39 @@ class HomeController extends GetxController {
     }
   }
 
-  void showSnackBar(String name) {
+
+  void showSnackBar(String name, {required String action}) {
+    Color bgColor;
+    IconData icon;
+    String message;
+
+    if (action == "like") {
+      bgColor = Colors.green;
+      icon = Icons.favorite;
+      message = "You liked $name";
+    } else if (action == "dislike") {
+      bgColor = Colors.red;
+      icon = Icons.close;
+      message = "You disliked $name";
+    } else { // favourite
+      bgColor = Colors.blue;
+      icon = Icons.star;
+      message = "$name has been added to favourites 💙";
+    }
+
     Get.showSnackbar(
       GetSnackBar(
-        title: 'Liked!',
-        message: 'You liked $name',
+        message: message,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
         duration: const Duration(seconds: 2),
+        backgroundColor: bgColor,
+        icon: Icon(icon, color: Colors.white),
       ),
     );
   }
+
 
   @override
   void onClose() {

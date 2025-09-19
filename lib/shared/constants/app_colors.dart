@@ -14,4 +14,6 @@ class AppColors {
   static const successColor = Color.fromARGB(255, 96, 191, 115);
   static const lightgrey = Color.fromARGB(248, 237, 235, 235);
   static const bordergrey = Color.fromARGB(255, 224, 224, 224);
+  static const goldenBackgroundColor= const Color(0xFFD3AD48);
+  static const silverColor=const Color(0xFFbababa);
 }
