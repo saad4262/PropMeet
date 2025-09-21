@@ -10,7 +10,7 @@ import 'home_custom_widgets/card_items.dart';
 class HomeView extends StatelessWidget {
   HomeView({super.key});
 
-  final HomeController controller = Get.find();
+  final HomeController controller = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {

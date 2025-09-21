@@ -315,7 +315,9 @@ class _SignupViewState extends State<SignupView> {
                                         authController.isLoading.value = false;
 
                                         if (success) {
-                                          Get.offAllNamed(AppRoutes.bottomBarView);
+                                          Get.offAllNamed(
+                                            AppRoutes.setupProfile,
+                                          );
                                         }
                                       }
                                     },
@@ -441,7 +443,7 @@ class _SignupViewState extends State<SignupView> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // Apple sign-in logic here
+                        Get.toNamed(AppRoutes.phoneSignup);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.white,

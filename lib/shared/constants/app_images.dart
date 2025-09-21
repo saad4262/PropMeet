@@ -9,4 +9,17 @@ class AppImages {
   static const facebook = "assets/images/facebook.svg";
   static const logo2 = "assets/images/logo2.svg";
   static const phone = "assets/images/phone.svg";
+  static const sell = "assets/images/sell.svg";
+  static const rent = "assets/images/rent.svg";
+  static const home = "assets/images/home.svg";
+  static const appartment = "assets/images/appartment.svg";
+  static const townhouse = "assets/images/townhouse.svg";
+  static const land = "assets/images/land.svg";
+  static const shield = "assets/images/sheild.svg";
+  static const map = "assets/images/map.svg";
+  static const map2 = "assets/images/map.png";
+  static const search = "assets/images/search.svg";
+  static const calender = "assets/images/calender.svg";
+  static const light = "assets/images/light.svg";
+  static const bulb = "assets/images/bulb.svg";
 }
