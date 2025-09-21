@@ -5,6 +5,7 @@ import 'package:propmeet/core/bindings/auth_binding.dart';
 import 'package:propmeet/core/bindings/bottom_bar_binding/bottom_bar_binding.dart';
 import 'package:propmeet/core/bindings/onBarding_binding.dart';
 import 'package:propmeet/core/bindings/splash_bindings.dart';
+import 'package:propmeet/core/bindings/user_profile_binding.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/chat_view_controller/chat_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
@@ -15,8 +16,10 @@ import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen.dart';
 import 'package:propmeet/presentation/views/onboarding_screen.dart';
+import 'package:propmeet/presentation/views/signup_auth/phone_signup.dart';
 import 'package:propmeet/presentation/views/signup_auth/signup_screen.dart';
 import 'package:propmeet/presentation/views/splash_screen.dart';
+import 'package:propmeet/presentation/views/user_profile/user_profile1.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
@@ -96,8 +99,22 @@ class AppPages {
       name: AppRoutes.userProfileView,
       page: () => UserProfileView(),
       binding: BindingsBuilder(() {
-        Get.lazyPut<UserProfileViewController>(() => UserProfileViewController());
+        Get.lazyPut<UserProfileViewController>(
+          () => UserProfileViewController(),
+        );
       }),
+    ),
+
+    GetPage(
+      name: AppRoutes.phoneSignup,
+      page: () => PhoneSignup(),
+      binding: AuthBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.setupProfile,
+      page: () => ProfileSetupScreen(),
+      binding: ProfileSetupBinding(),
     ),
   ];
 }

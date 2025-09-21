@@ -1,3 +1,5 @@
+import 'package:propmeet/presentation/views/signup_auth/phone_signup.dart';
+
 abstract class AppRoutes {
   static const splash = '/';
   static const onBoarding = '/onBoarding';
@@ -7,11 +9,12 @@ abstract class AppRoutes {
 
   //user side view
 
-  static const bottomBarView='/bottomBarView';
+  static const bottomBarView = '/bottomBarView';
   static const home = '/home';
-  static const chatView='/chatView';
-  static const topAgentView='/topAgentView';
-  static const favouriteView='/favouriteView';
-  static const userProfileView='/userProfileView';
-
+  static const chatView = '/chatView';
+  static const topAgentView = '/topAgentView';
+  static const favouriteView = '/favouriteView';
+  static const userProfileView = '/userProfileView';
+  static const phoneSignup = '/phoneSignup';
+  static const setupProfile = '/setupProfile';
 }
