@@ -6,8 +6,8 @@ class CustomButton extends StatelessWidget {
   final double width;
   final double height;
   final String text;
-  final IconData? icon; // optional icon
-  final String? imagePath; // optional image
+  final IconData? icon;
+  final String? imagePath;
   final VoidCallback onPressed;
 
   const CustomButton({
@@ -25,6 +25,7 @@ class CustomButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         width: width,
         height: height,
         decoration: BoxDecoration

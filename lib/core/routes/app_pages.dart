@@ -11,6 +11,7 @@ import 'package:propmeet/domain/viewmodels/user_side_controller/chat_view_contro
 import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/home_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
+import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/edit_user_profile_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/user_profile_view_controller.dart';
 import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
@@ -23,6 +24,7 @@ import 'package:propmeet/presentation/views/user_profile/user_profile1.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
+import 'package:propmeet/presentation/views/user_side_views/user_profile_view/edit_user_profile.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
 
 import '../../presentation/views/user_side_views/home_view/home_view.dart';
@@ -115,6 +117,15 @@ class AppPages {
       name: AppRoutes.setupProfile,
       page: () => ProfileSetupScreen(),
       binding: ProfileSetupBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.editUserProfile,
+      page: () => EditUserProfile(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<EditUserProfileViewController>(
+              () => EditUserProfileViewController(),
+        );
+      }),
     ),
   ];
 }

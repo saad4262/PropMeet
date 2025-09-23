@@ -1,21 +1,30 @@
 import 'package:get/get.dart';
+import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
+import '../../../../model/user_model/user_model.dart';
 
-class UserProfileViewController extends GetxController{
+class UserProfileViewController extends GetxController {
+  final UserProfileRepository _repository = UserProfileRepository();
+  double get completion => profile.value?.completionPercentage ?? 0.0;
 
-  final int totalComponents = 6;
+  var profile = Rxn<UserModel>();
 
-  var completedComponents = 5.obs;
-
-  var lookingFor = "Rent".obs;
-  var propertyType = "Apartment".obs;
-  var location = "Jakarta, Indonesia".obs;
-
-  final lookingForOptions = ["Rent", "Buy", "Sell"];
-  final propertyTypeOptions = ["Apartment", "House", "Villa"];
-  final locationOptions = ["Jakarta, Indonesia", "Lahore, Pakistan", "Dubai, UAE"];
-
-  void updateLookingFor(String value) => lookingFor.value = value;
-  void updatePropertyType(String value) => propertyType.value = value;
-  void updateLocation(String value) => location.value = value;
+  @override
+  void onInit() {
+    super.onInit();
+    loadProfile();
   }
 
+  Future<void> loadProfile() async {
+    profile.value = await _repository.fetchUserProfile();
+  }
+
+  Future<void> updateProfile(UserModel updatedUser) async {
+    try {
+      await _repository.updateUserProfile(updatedUser);
+      profile.value = updatedUser;
+    } catch (e) {
+      print("Error updating profile: $e");
+    }
+  }
+
+}

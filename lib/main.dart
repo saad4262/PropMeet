@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       title: 'PropMeet',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+     darkTheme: AppTheme.darkTheme,
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
     );
