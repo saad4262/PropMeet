@@ -12,6 +12,7 @@ import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_
 import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/home_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/user_profile_view_controller.dart';
+import 'package:propmeet/presentation/views/agent_profile/agent_profile.dart';
 import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen.dart';
@@ -114,6 +115,12 @@ class AppPages {
     GetPage(
       name: AppRoutes.setupProfile,
       page: () => ProfileSetupScreen(),
+      binding: ProfileSetupBinding(),
+    ),
+
+      GetPage(
+      name: AppRoutes.setupAgent,
+      page: () => AgentProfile(),
       binding: ProfileSetupBinding(),
     ),
   ];

@@ -22,4 +22,7 @@ class AppImages {
   static const calender = "assets/images/calender.svg";
   static const light = "assets/images/light.svg";
   static const bulb = "assets/images/bulb.svg";
+  static const sellAgent = "assets/images/sell_agent.svg";
+  static const propertyAgent = "assets/images/property_agent.svg";
+  static const profile = "assets/images/profile.svg";
 }

@@ -315,9 +315,18 @@ class _SignupViewState extends State<SignupView> {
                                         authController.isLoading.value = false;
 
                                         if (success) {
-                                          Get.offAllNamed(
-                                            AppRoutes.setupProfile,
-                                          );
+                                          if (authController
+                                                  .selectedTag
+                                                  .value ==
+                                              "user") {
+                                            Get.offAllNamed(
+                                              AppRoutes.setupProfile,
+                                            );
+                                          } else {
+                                            Get.offAllNamed(
+                                              AppRoutes.setupAgent,
+                                            );
+                                          }
                                         }
                                       }
                                     },
@@ -496,14 +505,22 @@ class _SignupViewState extends State<SignupView> {
                   ),
                 ),
                 SizedBox(height: Responsive.height(1)),
-
-                Text(
-                  "I am an Agent",
-                  style: TextStyle(
-                    fontSize: Responsive.fontSize(3),
-                    fontFamily: 'Poppins',
-                    color: AppColors.blueMain,
-                    fontWeight: FontWeight.bold,
+                Obx(
+                  () => GestureDetector(
+                    onTap: () {
+                      authController.toggleTag();
+                    },
+                    child: Text(
+                      authController.selectedTag.value == "user"
+                          ? "I am an Agent"
+                          : "I am a User",
+                      style: TextStyle(
+                        fontSize: Responsive.fontSize(3),
+                        fontFamily: 'Poppins',
+                        color: AppColors.blueMain,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],

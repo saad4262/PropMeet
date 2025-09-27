@@ -194,7 +194,7 @@ class ProfileSetup extends GetxController {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
-          .collection("profile_setup")
+          .collection("profile_user")
           .doc("setupData")
           .set(profileData, SetOptions(merge: true));
 

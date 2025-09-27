@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 part 'auth_model.freezed.dart';
 part 'auth_model.g.dart';
 
-
 @freezed
 abstract class Auth with _$Auth {
   const factory Auth({
@@ -12,6 +11,8 @@ abstract class Auth with _$Auth {
     // @Default('') String displayName,
     @Default('') String email,
     // @Default('') String avatarUrl,
+    @Default('user') String tag,
+
     @TimestampConverter() required Timestamp createdAt,
     @TimestampConverter() required Timestamp updatedAt,
   }) = _Auth;
@@ -28,7 +29,6 @@ abstract class Auth with _$Auth {
 extension AuthFirestoreX on Auth {
   Map<String, dynamic> toFirestore() => toJson();
 }
-
 
 class TimestampConverter implements JsonConverter<Timestamp, dynamic> {
   const TimestampConverter();

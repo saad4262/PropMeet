@@ -17,4 +17,5 @@ abstract class AppRoutes {
   static const userProfileView = '/userProfileView';
   static const phoneSignup = '/phoneSignup';
   static const setupProfile = '/setupProfile';
+  static const setupAgent = '/setupAgent';
 }

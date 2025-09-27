@@ -19,9 +19,20 @@ class AuthController extends GetxController {
   var isPasswordHidden = true.obs;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final RxBool isRemember = false.obs;
+  var selectedTag = "user".obs; // default user
 
   var verificationId = "".obs;
   var isOtpSent = false.obs;
+
+
+  void toggleTag() {
+  if (selectedTag.value == "user") {
+    selectedTag.value = "agent";
+  } else {
+    selectedTag.value = "user";
+  }
+}
+
 
   Future<void> sendOtp(String phoneNumber) async {
     phoneNumber = phoneNumber.trim();
@@ -134,6 +145,7 @@ class AuthController extends GetxController {
       final user = await _repo.signUp(
         email,
         password,
+        tag: selectedTag.value, 
         // name,
         // avatarFile: avatarFile.value,
       );
