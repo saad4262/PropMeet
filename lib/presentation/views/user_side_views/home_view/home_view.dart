@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
+import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/home_controller.dart';
 import 'package:propmeet/presentation/widgets/custom_user_appBar.dart';
 import 'package:propmeet/shared/constants/app_colors.dart';
@@ -20,7 +21,9 @@ class HomeView extends StatelessWidget {
       appBar: CustomUserAppbar(
         title: 'App Name',
         trailing: IconButton(
-          onPressed: () {},
+          onPressed: () {
+
+          },
           icon: Icon(Icons.menu, color: AppColors.primary),
         ),
       ),

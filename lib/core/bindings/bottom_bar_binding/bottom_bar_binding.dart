@@ -17,5 +17,5 @@ class BottomBarBinding extends Bindings {
     Get.lazyPut<TopAgentViewController>(() => TopAgentViewController());
     Get.lazyPut<FavouriteViewController>(() => FavouriteViewController());
     Get.lazyPut<UserProfileViewController>(() => UserProfileViewController());
-    }
-    }
+  }
+}

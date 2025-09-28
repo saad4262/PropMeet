@@ -19,9 +19,20 @@ class AuthController extends GetxController {
   var isPasswordHidden = true.obs;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final RxBool isRemember = false.obs;
+  var selectedTag = "user".obs; // default user
 
   var verificationId = "".obs;
   var isOtpSent = false.obs;
+
+
+  void toggleTag() {
+  if (selectedTag.value == "user") {
+    selectedTag.value = "agent";
+  } else {
+    selectedTag.value = "user";
+  }
+}
+
 
   Future<void> sendOtp(String phoneNumber) async {
     phoneNumber = phoneNumber.trim();
@@ -134,6 +145,7 @@ class AuthController extends GetxController {
       final user = await _repo.signUp(
         email,
         password,
+        tag: selectedTag.value, 
         // name,
         // avatarFile: avatarFile.value,
       );
@@ -185,59 +197,116 @@ class AuthController extends GetxController {
     }
   }
 
+  // Future<bool> login(String email, String password) async {
+  //   isLoading.value = true;
+  //   try {
+  //     final user = await _repo.login(email, password);
+  //     currentUser.value = user;
+  //     Get.closeCurrentSnackbar();
+  //
+  //     Get.snackbar(
+  //       "Success",
+  //       "Login successful",
+  //       backgroundColor: AppColors.successColor,
+  //     );
+  //     return true;
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'user-not-found') {
+  //       Get.closeCurrentSnackbar();
+  //
+  //       Get.snackbar(
+  //         "Error",
+  //         "No user found with this email",
+  //         backgroundColor: AppColors.errorColor,
+  //       );
+  //     } else if (e.code == 'wrong-password') {
+  //       Get.closeCurrentSnackbar();
+  //
+  //       Get.snackbar(
+  //         "Error",
+  //         "Incorrect password",
+  //         backgroundColor: AppColors.errorColor,
+  //       );
+  //     } else {
+  //       Get.closeCurrentSnackbar();
+  //
+  //       Get.snackbar(
+  //         "Error",
+  //         e.message ?? "An error occurred",
+  //         backgroundColor: AppColors.errorColor,
+  //       );
+  //     }
+  //     return false;
+  //   } catch (e) {
+  //     Get.closeCurrentSnackbar();
+  //
+  //     Get.snackbar(
+  //       "Error",
+  //       "Something went wrong",
+  //       backgroundColor: AppColors.errorColor,
+  //     );
+  //     return false;
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
   Future<bool> login(String email, String password) async {
     isLoading.value = true;
     try {
       final user = await _repo.login(email, password);
+      if (user == null) {
+        Get.snackbar("Error", "User ID not found",
+            backgroundColor: AppColors.errorColor);
+        return false;
+      }
+
       currentUser.value = user;
-      Get.closeCurrentSnackbar();
+
+      // Fetch role/tag from Firestore safely
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.userId!) // safe with !
+          .get();
+
+      if (snapshot.exists) {
+        final role = snapshot['tag'] ?? 'user'; // default to user
+
+        // Redirect based on role
+        if (role == 'agent') {
+          Get.offAllNamed(AppRoutes.agentBottomBarView);
+        } else {
+          Get.offAllNamed(AppRoutes.bottomBarView);
+        }
+      }
 
       Get.snackbar(
         "Success",
         "Login successful",
         backgroundColor: AppColors.successColor,
       );
+
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        Get.closeCurrentSnackbar();
-
-        Get.snackbar(
-          "Error",
-          "No user found with this email",
-          backgroundColor: AppColors.errorColor,
-        );
+        Get.snackbar("Error", "No user found with this email",
+            backgroundColor: AppColors.errorColor);
       } else if (e.code == 'wrong-password') {
-        Get.closeCurrentSnackbar();
-
-        Get.snackbar(
-          "Error",
-          "Incorrect password",
-          backgroundColor: AppColors.errorColor,
-        );
+        Get.snackbar("Error", "Incorrect password",
+            backgroundColor: AppColors.errorColor);
       } else {
-        Get.closeCurrentSnackbar();
-
-        Get.snackbar(
-          "Error",
-          e.message ?? "An error occurred",
-          backgroundColor: AppColors.errorColor,
-        );
+        Get.snackbar("Error", e.message ?? "An error occurred",
+            backgroundColor: AppColors.errorColor);
       }
       return false;
     } catch (e) {
-      Get.closeCurrentSnackbar();
-
-      Get.snackbar(
-        "Error",
-        "Something went wrong",
-        backgroundColor: AppColors.errorColor,
-      );
+      Get.snackbar("Error", "Something went wrong",
+          backgroundColor: AppColors.errorColor);
       return false;
     } finally {
       isLoading.value = false;
     }
   }
+
 
   void setAvatar(File? file) {
     avatarFile.value = file;

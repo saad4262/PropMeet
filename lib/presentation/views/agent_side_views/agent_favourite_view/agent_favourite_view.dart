@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
 
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/utils/responsive_utils.dart';
 
 class AgentFavouriteView extends StatelessWidget {
-  const AgentFavouriteView({super.key});
+   AgentFavouriteView({super.key});
 
+   final AgentFavouriteViewController controller=Get.find();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

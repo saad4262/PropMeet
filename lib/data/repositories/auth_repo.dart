@@ -6,9 +6,10 @@ class AuthRepository {
 
   AuthRepository();
 
-  Future<Auth?> signUp(String email, String password) async {
-    return _service.signUp(email, password);
+  Future<Auth?> signUp(String email, String password, {String tag = 'user'}) async {
+    return _service.signUp(email, password, tag: tag);
   }
+
 
   Future<Auth?> login(String email, String password) {
     return _service.login(email, password);

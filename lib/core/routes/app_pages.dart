@@ -7,12 +7,18 @@ import 'package:propmeet/core/bindings/onBarding_binding.dart';
 import 'package:propmeet/core/bindings/splash_bindings.dart';
 import 'package:propmeet/core/bindings/user_profile_binding.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_all_users_controller/top_user_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_bottom_bar_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_chat_view_controller/agent_chat_view_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_home_view_controller/agent_home_view_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_profile_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/chat_view_controller/chat_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/home_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
-import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/edit_user_profile_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/user_profile_view_controller.dart';
+import 'package:propmeet/presentation/views/agent_bottom_bar_view/agent_bottom_bar_view.dart';
 import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen.dart';
@@ -24,10 +30,12 @@ import 'package:propmeet/presentation/views/user_profile/user_profile1.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
-import 'package:propmeet/presentation/views/user_side_views/user_profile_view/edit_user_profile.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
 
+import '../../domain/viewmodels/user_side_controller/user_profile_view_controller/edit_user_profile_view_controller.dart';
+import '../../presentation/views/agent_profile.dart';
 import '../../presentation/views/user_side_views/home_view/home_view.dart';
+import '../../presentation/views/user_side_views/user_profile_view/edit_user_profile.dart';
 
 class AppPages {
   static final routes = [
@@ -123,8 +131,26 @@ class AppPages {
       page: () => EditUserProfile(),
       binding: BindingsBuilder(() {
         Get.lazyPut<EditUserProfileViewController>(
-              () => EditUserProfileViewController(),
+          () => EditUserProfileViewController(),
         );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.setupAgent,
+      page: () => AgentProfile(),
+      binding: ProfileSetupBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.agentBottomBarView,
+      page: () => AgentBottomBarView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<AgentBottomBarController>(() => AgentBottomBarController());
+        Get.lazyPut<AgentHomeViewController>(() => AgentHomeViewController());
+        Get.lazyPut<AgentFavouriteViewController>(() => AgentFavouriteViewController());
+        Get.lazyPut<TopUserController>(() => TopUserController());
+        Get.lazyPut<AgentProfileViewController>(() => AgentProfileViewController());
+        Get.lazyPut<AgentChatViewController>(() => AgentChatViewController());
       }),
     ),
   ];

@@ -351,6 +351,8 @@ class ProfileSetupScreen extends StatelessWidget {
               ],
             ),
           ),
+      
+      
         ],
       ),
     );
@@ -881,7 +883,6 @@ class ProfileSetupScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔹 Use current location button
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton.icon(

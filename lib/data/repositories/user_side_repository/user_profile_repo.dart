@@ -15,7 +15,7 @@ class UserProfileRepository {
     final setupDoc = await _db
         .collection('users')
         .doc(uid)
-        .collection('profile_setup')
+        .collection('profile_user')
         .doc('setupData')
         .get();
 
@@ -38,7 +38,7 @@ class UserProfileRepository {
     await _db
         .collection("users")
         .doc(uid)
-        .collection("profile_setup")
+        .collection("profile_user")
         .doc("setupData")
         .set({
       "location": user.location,
