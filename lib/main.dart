@@ -10,14 +10,24 @@ import 'core/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Force portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // Status bar style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // <-- black bg hat jayega
-      statusBarIconBrightness: Brightness.light, // light icons (for dark bg)
-      statusBarBrightness: Brightness.dark, // iOS ke liye
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // dark icons (for light bg)
+      statusBarBrightness: Brightness.light, // iOS ke liye
     ),
   );
+
   runApp(const MyApp());
 }
 
@@ -27,11 +37,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
+
     return GetMaterialApp(
       title: 'PropMeet',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-     darkTheme: AppTheme.darkTheme,
+      darkTheme: AppTheme.lightTheme,
+      themeMode: ThemeMode.light,
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
     );

@@ -44,7 +44,7 @@ class CustomUserAppbar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
              SvgPicture.asset(
-               'assets/images/logo2.svg', width: 20
+               AppAssets.homeIcon, width: 20
                ,color: AppColors.primary,
              ),
               SizedBox(width: Responsive.width(4),),

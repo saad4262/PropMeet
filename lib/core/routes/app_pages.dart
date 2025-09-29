@@ -13,12 +13,14 @@ import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_chat_view
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_home_view_controller/agent_home_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_profile_view_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_subscription_plan_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/chat_view_controller/chat_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/home_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/user_profile_view_controller.dart';
 import 'package:propmeet/presentation/views/agent_bottom_bar_view/agent_bottom_bar_view.dart';
+import 'package:propmeet/presentation/views/agent_side_views/agent_profile_view/agent_subscription_view.dart';
 import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen.dart';
@@ -147,10 +149,24 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.lazyPut<AgentBottomBarController>(() => AgentBottomBarController());
         Get.lazyPut<AgentHomeViewController>(() => AgentHomeViewController());
-        Get.lazyPut<AgentFavouriteViewController>(() => AgentFavouriteViewController());
+        Get.lazyPut<AgentFavouriteViewController>(
+          () => AgentFavouriteViewController(),
+        );
         Get.lazyPut<TopUserController>(() => TopUserController());
-        Get.lazyPut<AgentProfileViewController>(() => AgentProfileViewController());
+        Get.lazyPut<AgentProfileViewController>(
+          () => AgentProfileViewController(),
+        );
         Get.lazyPut<AgentChatViewController>(() => AgentChatViewController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.agentSubscriptionPlan,
+      page: () => AgentSubscriptionView(),
+
+      binding: BindingsBuilder(() {
+        Get.lazyPut<AgentSubscriptionPlanController>(
+          () => AgentSubscriptionPlanController(),
+        );
       }),
     ),
   ];

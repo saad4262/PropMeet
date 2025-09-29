@@ -1,0 +1,71 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:propmeet/model/agent_model/agent_model.dart';
+
+class AgentProfileRepository {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  /// Fetch agent profile
+  Future<AgentFieldData?> fetchAgentProfile() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    // Root user doc
+    final userDoc = await _db.collection('users').doc(uid).get();
+
+    // Agent profile subdoc
+    final setupDoc = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('agentProfile')
+        .doc('profile')
+        .get();
+
+    if (userDoc.exists && setupDoc.exists) {
+      return AgentFieldData.fromFirestore(
+        userDoc.data() ?? {},
+        setupDoc.data() ?? {},
+      );
+    }
+    return null;
+  }
+
+  /// Update (or create) agent profile
+  Future<void> updateAgentProfile(AgentFieldData agent) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    final firestoreData = agent.toFirestore();
+
+    final userRef = _db.collection("users").doc(uid);
+
+    // Ensure root document exists with createdAt if missing
+    final userDoc = await userRef.get();
+    if (!userDoc.exists || !(userDoc.data()?.containsKey("createdAt") ?? false)) {
+      await userRef.set({
+        "createdAt": FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    }
+
+    // Save fieldData + toggles at root
+    await userRef.set(
+      {
+        "fieldData": firestoreData["fieldData"],
+        "toggleLeaseRenewal": firestoreData["toggleLeaseRenewal"],
+        "toggleNegotiable": firestoreData["toggleNegotiable"],
+      },
+      SetOptions(merge: true),
+    );
+
+    // Save profile subdocument
+    await userRef.collection("agentProfile").doc("profile").set(
+      {
+        "selectionsOption1": firestoreData["selectionsOption1"],
+        "selectionsOption2": firestoreData["selectionsOption2"],
+        "setSelection": firestoreData["setSelection"],
+      },
+      SetOptions(merge: true),
+    );
+  }
+}

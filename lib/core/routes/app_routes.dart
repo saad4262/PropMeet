@@ -21,6 +21,7 @@ abstract class AppRoutes {
   static const setupAgent = '/setupAgent';
 
   static const agentBottomBarView='/agentBottomBarView';
+  static const agentSubscriptionPlan='/agentSubscriptionPlan';
 
 
 }
