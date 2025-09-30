@@ -21,4 +21,13 @@ class AppAssets{
   static const String bonusIcon="$imagesPath/bonus_icon.svg";
   static const String platinumIcon="$imagesPath/platinum_icon.svg";
 
+  static const String bedroomIcon="$imagesPath/bed_icon.svg";
+  static const String bathroomIcon="$imagesPath/bathtub_icon.svg";
+  static const String homeOnSaleIcon="$imagesPath/home_on_sale_icon.svg";
+  static const String landSizeIcon="$imagesPath/land_size_icon.svg";
+
+
+
+
+
 }

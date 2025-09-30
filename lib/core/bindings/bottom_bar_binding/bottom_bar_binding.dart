@@ -12,10 +12,10 @@ class BottomBarBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<BottomBarController>(() => BottomBarController());
+    Get.lazyPut<FavouriteViewController>(() => FavouriteViewController());
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<ChatViewController>(() => ChatViewController());
     Get.lazyPut<TopAgentViewController>(() => TopAgentViewController());
-    Get.lazyPut<FavouriteViewController>(() => FavouriteViewController());
     Get.lazyPut<UserProfileViewController>(() => UserProfileViewController());
   }
 }

@@ -1,71 +1,99 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
-import '../../../../presentation/views/agent_side_views/agent_home_view/custom_agent_home_widgets/agent_card_widget.dart';
-import '../../../../shared/config/app_assets/app_assets.dart';
+import 'package:propmeet/shared/constants/app_colors.dart';
+import '../../../../core/enum/enum.dart';
+import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
+import '../../../../model/user_model/user_model.dart';
 
-class AgentHomeViewController extends GetxController{
+// class AgentHomeViewController extends GetxController{
+//
+//   final AgentFavouriteViewController favouriteController = Get.find();
+//   final UserProfileRepository _repository = UserProfileRepository();
+//   final CardSwiperController swiperController = CardSwiperController();
+//   final RxInt currentIndex = 0.obs;
+//   final RxDouble progress = 0.0.obs;
+//
+//   late Timer _progressTimer;
+//
+//   final List<Map<String, String>> allUsers = [
+//     {'name': 'Ahmad', 'image': AppAssets.user1, 'distance': '13'},
+//     {'name': 'Ali', 'image':  AppAssets.user2,'distance': '2'},
+//     {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '130'},
+//     {'name': 'Ping', 'image':  AppAssets.user4,'distance': '120'},
+//     {'name': 'Ahmad', 'image': AppAssets.user1,'distance': '22'},
+//     {'name': 'Ali', 'image':  AppAssets.user2,'distance': '11'},
+//     {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '13'},
+//     {'name': 'Ping', 'image':  AppAssets.user4,'distance': '223'},
+//   ];
+//
+//   final RxList<Map<String, String>> currentCards = <Map<String, String>>[].obs;
+//   final RxSet<String> likedNames = <String>{}.obs;
+//
+//   final RxBool isLoading = true.obs;
+//
+//   final RxBool showRefresh = false.obs;
+//
+//   AgentHomeViewController() {
+//     currentCards.value = List<Map<String, String>>.from(allUsers)..shuffle();
+//   }
+//
+//   var likeAnimationTrigger = false.obs; // this will trigger my heart wala icon
+//   var dislikeAnimationTrigger = false.obs;
+//   var swipeAction = SwipeAction.none.obs;
+//
+//   var swipedCardName = ''.obs;
+//
+//   var swipePreviewDirection = SwipeAction.none.obs;
+//   var swipePreviewCardName = ''.obs;
 
+
+
+class AgentHomeViewController extends GetxController {
   final AgentFavouriteViewController favouriteController = Get.find();
-
+  final UserProfileRepository _repository = UserProfileRepository();
   final CardSwiperController swiperController = CardSwiperController();
+
+  // ✅ Use UserModel instead of Map
+  final RxList<UserModel> currentCards = <UserModel>[].obs;
+  final RxSet<String> likedNames = <String>{}.obs;
+
   final RxInt currentIndex = 0.obs;
   final RxDouble progress = 0.0.obs;
+  final RxBool isLoading = true.obs;
+  final RxBool showRefresh = false.obs;
 
   late Timer _progressTimer;
 
-  final List<Map<String, String>> allUsers = [
-    {'name': 'Ahmad', 'image': AppAssets.user1, 'distance': '13'},
-    {'name': 'Ali', 'image':  AppAssets.user2,'distance': '2'},
-    {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '130'},
-    {'name': 'Ping', 'image':  AppAssets.user4,'distance': '120'},
-    {'name': 'Ahmad', 'image': AppAssets.user1,'distance': '22'},
-    {'name': 'Ali', 'image':  AppAssets.user2,'distance': '11'},
-    {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '13'},
-    {'name': 'Ping', 'image':  AppAssets.user4,'distance': '223'},
-  ];
-
-  final RxList<Map<String, String>> currentCards = <Map<String, String>>[].obs;
-  final RxSet<String> likedNames = <String>{}.obs;
-
-  final RxBool isLoading = true.obs;
-
-  final RxBool showRefresh = false.obs;
-
-  AgentHomeViewController() {
-    currentCards.value = List<Map<String, String>>.from(allUsers)..shuffle();
-  }
-
-  var likeAnimationTrigger = false.obs; // this will trigger my heart wala icon
-  var dislikeAnimationTrigger = false.obs;
   var swipeAction = SwipeAction.none.obs;
-
   var swipedCardName = ''.obs;
-
   var swipePreviewDirection = SwipeAction.none.obs;
   var swipePreviewCardName = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
-    Future.delayed(const Duration(seconds: 5), () {
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    try {
+      isLoading.value = true;
+      final users = await _repository.fetchAllUsersForCards(); // now returns List<UserModel>
+      if (users.isNotEmpty) {
+        currentCards.assignAll(users..shuffle());
+      }
+    } catch (e) {
+      print("Error fetching users: $e");
+    } finally {
       isLoading.value = false;
-    });
-
-    startProgressTimer();
+      startProgressTimer();
+    }
   }
 
-  void shuffleUsers() {
-    currentCards.value = List<Map<String, String>>.from(allUsers)..shuffle();
-    currentIndex.value = 0;
-    resetProgress();
-    startProgressTimer();
-    showRefresh.value = false;
-  }
 
   void resetProgress() {
     progress.value = 0.0;
@@ -76,7 +104,7 @@ class AgentHomeViewController extends GetxController{
     _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (progress.value >= 1.0) {
         timer.cancel();
-        //    autoSwipeLeft();
+        // autoSwipeLeft(); // if you want auto swipe
       } else {
         progress.value += 0.01;
       }
@@ -91,25 +119,24 @@ class AgentHomeViewController extends GetxController{
     }
   }
 
-
   @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer.cancel();
 
     final swipedUser = currentCards[previousIndex];
     this.currentIndex.value = currentIndex ?? previousIndex;
-    swipedCardName.value = swipedUser['name']!;
+    swipedCardName.value = swipedUser.name ?? "Unknown";
 
     if (direction == CardSwiperDirection.right) {
-      likedNames.add(swipedUser['name']!);
+      likedNames.add(swipedUser.name ?? "");
       swipeAction.value = SwipeAction.like;
 
-      favouriteController.addToFavourites(swipedUser);
+      // favouriteController.addToFavourites(swipedUser);
 
-      showSnackBar(swipedUser['name']!, action: "like");
+      showSnackBar(swipedUser.name ?? "User", action: "like");
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
-      showSnackBar(swipedUser['name']!, action: "dislike");
+      showSnackBar(swipedUser.name ?? "User", action: "dislike");
     }
 
     Future.delayed(const Duration(milliseconds: 400), () {
@@ -126,7 +153,6 @@ class AgentHomeViewController extends GetxController{
     return true;
   }
 
-
   void updateSwipePreview(double percentX, String cardName) {
     if (percentX >= 0.2) {
       swipePreviewDirection.value = SwipeAction.like;
@@ -140,21 +166,20 @@ class AgentHomeViewController extends GetxController{
     }
   }
 
-
   void showSnackBar(String name, {required String action}) {
     Color bgColor;
     IconData icon;
     String message;
 
     if (action == "like") {
-      bgColor = Colors.green;
+      bgColor = AppColors.primary;
       icon = Icons.favorite;
       message = "You liked $name";
     } else if (action == "dislike") {
       bgColor = Colors.red;
       icon = Icons.close;
       message = "You disliked $name";
-    } else { // favourite
+    } else {
       bgColor = Colors.blue;
       icon = Icons.star;
       message = "$name has been added to favourites 💙";
@@ -166,13 +191,12 @@ class AgentHomeViewController extends GetxController{
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(12),
         borderRadius: 8,
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 1),
         backgroundColor: bgColor,
         icon: Icon(icon, color: Colors.white),
       ),
     );
   }
-
 
   @override
   void onClose() {

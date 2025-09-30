@@ -1,130 +1,237 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:propmeet/presentation/views/agent_side_views/agent_home_view/custom_agent_home_widgets/agent_card_proifle_widget.dart';
-
+import '../../../../../core/enum/enum.dart';
 import '../../../../../shared/config/app_assets/app_assets.dart';
 import '../../../../../shared/constants/app_colors.dart';
 import '../../../../../shared/utils/responsive_utils.dart';
 
+
 class AgentCardWidget extends StatelessWidget {
-
-
-    final String name;
-    final String distance;
-    final String imagePath;
+    final Map<String, dynamic> user;
     final double progress;
     final bool isLiked;
     final SwipeAction swipeAction;
     final String swipedCardName;
     final SwipeAction previewAction;
+
     final String previewName;
 
     const AgentCardWidget({
-        required this.name,
-        required this.imagePath,
+        required this.user,
         required this.progress,
         required this.isLiked,
         required this.swipeAction,
         required this.swipedCardName,
-        super.key,
         required this.previewAction,
-        required this.previewName, required this.distance,
+        required this.previewName,
+        super.key,
     });
 
     @override
     Widget build(BuildContext context) {
         return SizedBox(
-            height: Responsive.screenHeight*0.65,
-          child: Card(
-              elevation: 3,
-              color: AppColors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                      Expanded(
-                          flex: 4,
-                          child: Image.asset(
-                              imagePath,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                          ),
-                      ),
+            height: Responsive.screenHeight * 0.65,
+            child: Card(
+                elevation: 3,
+                color: AppColors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
-                      Expanded(
-                          flex: 5,
-                          child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                      Row(
-                                          children: [
-                                              Text(
-                                                  name,
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.bold,
-                                                  ),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Image.asset(AppAssets.verifiedIcon,
-                                                  width: 18),
-                                          ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                          "$distance km away",
-                                          style: TextStyle(
-                                              fontSize: Responsive.fontSize(4),
-                                              color: AppColors.grey,
-                                          ),
-                                      ),
-                                      const SizedBox(height: 12),
+                        /// --- Top Section (Profile Circle + Name + Location) ---
+                        Expanded(
+                            flex: 4,
+                            child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(15),
+                                        topRight: Radius.circular(15),
+                                    ),
+                                ),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                        Container(
+                                            height: 120,
+                                            width: 120,
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.grey.shade300,
+                                                border: Border.all(
+                                                    color: AppColors.goldenBackgroundColor,
+                                                    width: 5,
+                                                ),
+                                            ),
+                                            child: user["image"] != null &&
+                                                user["image"].toString().isNotEmpty
+                                                ? ClipOval(
+                                                child: Image.network(
+                                                    user["image"],
+                                                    fit: BoxFit.cover,
+                                                ),
+                                            )
+                                                : Center(
+                                                child: Text(
+                                                    (user["name"]?.isNotEmpty ?? false)
+                                                        ? user["name"][0].toUpperCase()
+                                                        : "?",
+                                                    style: TextStyle(
+                                                        fontSize: Responsive.fontSize(15),
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white,
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        const SizedBox(height: 8),
 
-                                      Expanded(
-                                          child: GridView.count(
-                                              shrinkWrap: true,
-                                              physics: const NeverScrollableScrollPhysics(),
-                                              crossAxisCount: 3,
-                                              mainAxisSpacing: 8,
-                                              crossAxisSpacing: 8,
-                                              childAspectRatio: 1.2,
-                                              children: [
-                                                  AgentCardProfileWidget(
-                                                      title: 'Experience',
-                                                      subtitle: '5+ years',
-                                                      icon: Icons.work,
-                                                      iconColor: AppColors.black,
-                                                  ),
-                                                  AgentCardProfileWidget(),
-                                                  AgentCardProfileWidget(
-                                                      title: 'Rating',
-                                                      subtitle: '4.8',
-                                                      icon: Icons.star,
-                                                      iconColor: Colors.yellow,
-                                                  ),
-                                                  AgentCardProfileWidget(
-                                                      title: 'Location',
-                                                      subtitle: 'NY, USA',
-                                                      icon: Icons.location_on,
-                                                      iconColor: Colors.black,
-                                                  ),
-                                                  AgentCardProfileWidget(),
-                                              ],
-                                          ),
-                                      ),
-                                  ],
-                              ),
-                          ),
-                      )
-                  ],
-              ),
-          ),
+                                        /// Name
+                                        Text(
+                                            user["name"] ?? "--",
+                                            style: TextStyle(
+                                                fontSize: Responsive.fontSize(4),
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                            ),
+                                        ),
+
+                                        /// Small card with distance + location
+                                        SizedBox(
+                                            height: 50,
+                                            child: Card(
+                                                color: AppColors.primary.withOpacity(0.36),
+                                                elevation: 2,
+                                                child: Padding(
+                                                    padding: const EdgeInsets.symmetric(
+                                                        horizontal: 12, vertical: 6),
+                                                    child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                            Text(
+                                                                user["email"] ?? "-- km",
+                                                                style: TextStyle(
+                                                                    color: AppColors.white,
+                                                                    fontSize: Responsive.fontSize(1.5),
+                                                                ),
+                                                            ),
+                                                            Row(
+                                                                children: [
+                                                                    const Icon(
+                                                                        Icons.location_on_outlined,
+                                                                        size: 18,
+                                                                        color: Colors.white,
+                                                                    ),
+                                                                    const SizedBox(width: 4),
+                                                                    Text(
+                                                                        user["location"] ?? "--",
+                                                                        style: TextStyle(
+                                                                            color: AppColors.white,
+                                                                            fontSize: Responsive.fontSize(3.5),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ),
+
+                        /// --- Bottom Section (Details + Goals) ---
+                        Expanded(
+                            flex: 6,
+                            child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: SingleChildScrollView( // ✅ Prevent overflow
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+
+                                            /// Property Info Row
+                                            Wrap(
+                                                spacing: 12,
+                                                runSpacing: 8,
+                                                alignment: WrapAlignment.start,
+                                                children: [
+                                                    _infoRow(AppAssets.bedroomIcon, user["bedrooms"]),
+                                                    _infoRow(AppAssets.bathroomIcon, user["bathrooms"]),
+                                                    _infoRow(null, user["parking"],
+                                                        icon: Icons.directions_car),
+                                                    _infoRow(AppAssets.landSizeIcon, user["landSize"]),
+                                                    Text(
+                                                        user["propertyType"] ?? "--",
+                                                        style: TextStyle(
+                                                            color: AppColors.grey.shade800,
+                                                            fontSize: Responsive.fontSize(3.5),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+
+                                            const SizedBox(height: 12),
+
+                                            /// Profile details (goals, timeline, value)
+                                            AgentCardProfileWidget(
+                                                title: "What are you looking to do?",
+                                                subtitle: user["goal"] ?? "--",
+                                                icon: AppAssets.homeOnSaleIcon,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            AgentCardProfileWidget(
+                                                title: "Timeline",
+                                                subtitle: user["timeline"] ?? "--",
+                                                icon: AppAssets.bonusIcon,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            AgentCardProfileWidget(
+                                                title: "Approx. property value?",
+                                                subtitle: user["valueRange"] ?? "--",
+                                                icon: AppAssets.bonusIcon,
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ],
+                ),
+            ),
         );
     }
+
+    Widget _infoRow(String? asset, dynamic value, {IconData? icon}) {
+        if (asset == null || asset.isEmpty) {
+            return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                    Icon(icon ?? Icons.help_outline, size: 20, color: AppColors.black),
+                    const SizedBox(width: 4),
+                    Text(value?.toString() ?? "--",
+                        style: TextStyle(fontSize: Responsive.fontSize(3.5))),
+                ],
+            );
+        }
+
+        return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+                SvgPicture.asset(asset, width: 20),
+                const SizedBox(width: 4),
+                Text(value?.toString() ?? "--",
+                    style: TextStyle(fontSize: Responsive.fontSize(3.5))),
+            ],
+        );
+    }
+
 }
-enum SwipeAction { none, like, dislike }

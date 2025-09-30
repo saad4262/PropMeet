@@ -31,9 +31,11 @@ import 'package:propmeet/presentation/views/splash_screen.dart';
 import 'package:propmeet/presentation/views/user_profile/user_profile1.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
+import 'package:propmeet/presentation/views/user_side_views/home_view/filter_page.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
 
+import '../../domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
 import '../../domain/viewmodels/user_side_controller/user_profile_view_controller/edit_user_profile_view_controller.dart';
 import '../../presentation/views/agent_profile.dart';
 import '../../presentation/views/user_side_views/home_view/home_view.dart';
@@ -79,6 +81,7 @@ class AppPages {
       name: AppRoutes.home,
       page: () => HomeView(),
       binding: BindingsBuilder(() {
+        Get.lazyPut<FavouriteViewController>(() => FavouriteViewController());
         Get.lazyPut<HomeController>(() => HomeController());
       }),
     ),
@@ -148,10 +151,10 @@ class AppPages {
       page: () => AgentBottomBarView(),
       binding: BindingsBuilder(() {
         Get.lazyPut<AgentBottomBarController>(() => AgentBottomBarController());
-        Get.lazyPut<AgentHomeViewController>(() => AgentHomeViewController());
         Get.lazyPut<AgentFavouriteViewController>(
-          () => AgentFavouriteViewController(),
+              () => AgentFavouriteViewController(),
         );
+        Get.lazyPut<AgentHomeViewController>(() => AgentHomeViewController());
         Get.lazyPut<TopUserController>(() => TopUserController());
         Get.lazyPut<AgentProfileViewController>(
           () => AgentProfileViewController(),
@@ -168,6 +171,11 @@ class AppPages {
           () => AgentSubscriptionPlanController(),
         );
       }),
+    ),
+    GetPage(
+      name: AppRoutes.filterPage,
+      page: () => FilterPage(),
+
     ),
   ];
 }

@@ -47,4 +47,66 @@ class UserProfileRepository {
       "selections": user.selections,
     }, SetOptions(merge: true));
   }
+
+  Future<List<UserModel>> fetchAllUsers() async {
+    final querySnapshot = await _db.collection("users").get();
+
+    List<UserModel> users = [];
+    for (var doc in querySnapshot.docs) {
+      try {
+        final setupDoc = await _db
+            .collection("users")
+            .doc(doc.id)
+            .collection("profile_user")
+            .doc("setupData")
+            .get();
+
+        final rootData = doc.data();
+        final setupData = setupDoc.data() ?? {};
+
+        // Debug log
+        print("Fetched user: ${doc.id}, setup exists: ${setupDoc.exists}");
+
+        users.add(UserModel.fromFirestore(rootData, setupData));
+      } catch (e) {
+        print("Error parsing user ${doc.id}: $e");
+      }
+    }
+    return users;
+  }
+
+
+  Future<List<UserModel>> fetchAllUsersForCards() async {
+    final snapshot = await _db.collection("users").get();
+
+    List<UserModel> users = [];
+
+    for (var doc in snapshot.docs) {
+      final rootData = doc.data();
+
+      // ✅ Skip if user is tagged as agent
+      if ((rootData["tag"] ?? "").toString().toLowerCase() == "agent") {
+        continue;
+      }
+
+      final setupDoc = await _db
+          .collection("users")
+          .doc(doc.id)
+          .collection("profile_user")
+          .doc("setupData")
+          .get();
+
+      final setupData = setupDoc.data() ?? {};
+
+      try {
+        final user = UserModel.fromFirestore(rootData, setupData);
+        users.add(user);
+      } catch (e) {
+        print("Error building UserModel for ${doc.id}: $e");
+      }
+    }
+
+    return users;
+  }
+
 }

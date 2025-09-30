@@ -9,8 +9,9 @@ import '../../../../presentation/views/user_side_views/home_view/home_custom_wid
 import '../favourites_view_controller/favourite_view_controller.dart';
 
 class HomeController extends GetxController {
+  late FavouriteViewController favouriteController;
 
-  final FavouriteViewController favouriteController = Get.find();
+  //final FavouriteViewController favouriteController = Get.find();
 
   final CardSwiperController swiperController = CardSwiperController();
   final RxInt currentIndex = 0.obs;
@@ -52,6 +53,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    favouriteController = Get.find<FavouriteViewController>();
     Future.delayed(const Duration(seconds: 5), () {
       isLoading.value = false;
     });

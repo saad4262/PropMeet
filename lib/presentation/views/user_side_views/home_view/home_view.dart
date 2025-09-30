@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
+import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/favourites_view_controller/favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/home_controller.dart';
 import 'package:propmeet/presentation/widgets/custom_user_appBar.dart';
@@ -22,7 +23,7 @@ class HomeView extends StatelessWidget {
         title: 'App Name',
         trailing: IconButton(
           onPressed: () {
-
+Get.offAllNamed(AppRoutes.filterPage);
           },
           icon: Icon(Icons.menu, color: AppColors.primary),
         ),
@@ -35,7 +36,7 @@ class HomeView extends StatelessWidget {
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.78,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Obx(() {
@@ -143,30 +144,30 @@ class HomeView extends StatelessWidget {
               return Stack(
                 children: [
                   Positioned(
-                    left: 30,
+                    left: 50,
                     bottom: 10,
-                    child: _buildIconButton(Icons.close, Colors.red, () {
+                    child: _buildIconButton(Icons.close, AppColors.goldenBackgroundColor, () {
                       controller.swiperController
                           .swipe(CardSwiperDirection.left);
                     }),
                   ),
+                  // Positioned(
+                  //   left: 0,
+                  //   right: 0,
+                  //   bottom: 35,
+                  //   child:
+                  //   _buildIconButton(Icons.favorite, AppColors.primary, () {
+                  //     final currentCard = controller.currentCards[controller.currentIndex.value];
+                  //     controller.favouriteController.addToFavourites(currentCard);
+                  //     controller.showSnackBar(currentCard['name']!, action: "favourite");
+                  //     controller.swiperController.swipe(CardSwiperDirection.right);
+                  //   }),
+                  //
+                  // ),
                   Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 35,
-                    child:
-                    _buildIconButton(Icons.favorite, AppColors.primary, () {
-                      final currentCard = controller.currentCards[controller.currentIndex.value];
-                      controller.favouriteController.addToFavourites(currentCard);
-                      controller.showSnackBar(currentCard['name']!, action: "favourite");
-                      controller.swiperController.swipe(CardSwiperDirection.right);
-                    }),
-
-                  ),
-                  Positioned(
-                    right: 30,
+                    right: 50,
                     bottom: 10,
-                    child: _buildIconButton(Icons.check, Colors.green, () {}),
+                    child: _buildIconButton(Icons.check, AppColors.primary, () {}),
                   ),
                 ],
               );

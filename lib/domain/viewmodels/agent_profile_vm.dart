@@ -198,7 +198,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
+
+import '../../core/bindings/bottom_bar_binding/bottom_bar_binding.dart';
+import '../../presentation/views/agent_bottom_bar_view/agent_bottom_bar_view.dart';
 
 class ProfileSetupController extends GetxController {
   final int totalPages = 11;
@@ -577,6 +581,7 @@ class ProfileSetupController extends GetxController {
           .set(data, SetOptions(merge: true));
 
       Get.snackbar("Success", "Agent profile saved successfully!");
+      Get.offAllNamed(AppRoutes.agentBottomBarView);
       print("✅ Agent profile saved inside Firestore");
     } catch (e) {
       print("❌ Error saving agent profile: $e");
