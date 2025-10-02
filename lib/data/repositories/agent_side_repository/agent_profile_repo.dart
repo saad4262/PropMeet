@@ -30,14 +30,50 @@ class AgentProfileRepository {
     }
     return null;
   }
-
+  //
+  // /// Update (or create) agent profile
+  // Future<void> updateAgentProfile(AgentFieldData agent) async {
+  //   final uid = _auth.currentUser?.uid;
+  //   if (uid == null) return;
+  //
+  //   final firestoreData = agent.toFirestore();
+  //
+  //   final userRef = _db.collection("users").doc(uid);
+  //
+  //   // Ensure root document exists with createdAt if missing
+  //   final userDoc = await userRef.get();
+  //   if (!userDoc.exists || !(userDoc.data()?.containsKey("createdAt") ?? false)) {
+  //     await userRef.set({
+  //       "createdAt": FieldValue.serverTimestamp(),
+  //     }, SetOptions(merge: true));
+  //   }
+  //
+  //   // Save fieldData + toggles at root
+  //   await userRef.set(
+  //     {
+  //       "fieldData": firestoreData["fieldData"],
+  //       "toggleLeaseRenewal": firestoreData["toggleLeaseRenewal"],
+  //       "toggleNegotiable": firestoreData["toggleNegotiable"],
+  //     },
+  //     SetOptions(merge: true),
+  //   );
+  //
+  //   // Save profile subdocument
+  //   await userRef.collection("agentProfile").doc("profile").set(
+  //     {
+  //       "selectionsOption1": firestoreData["selectionsOption1"],
+  //       "selectionsOption2": firestoreData["selectionsOption2"],
+  //       "setSelection": firestoreData["setSelection"],
+  //     },
+  //     SetOptions(merge: true),
+  //   );
+  // }
   /// Update (or create) agent profile
   Future<void> updateAgentProfile(AgentFieldData agent) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
 
     final firestoreData = agent.toFirestore();
-
     final userRef = _db.collection("users").doc(uid);
 
     // Ensure root document exists with createdAt if missing
@@ -48,7 +84,7 @@ class AgentProfileRepository {
       }, SetOptions(merge: true));
     }
 
-    // Save fieldData + toggles at root
+    // Save toggles & fieldData at root
     await userRef.set(
       {
         "fieldData": firestoreData["fieldData"],
@@ -58,7 +94,7 @@ class AgentProfileRepository {
       SetOptions(merge: true),
     );
 
-    // Save profile subdocument
+    // Save nested selections (profile subdocument)
     await userRef.collection("agentProfile").doc("profile").set(
       {
         "selectionsOption1": firestoreData["selectionsOption1"],
@@ -68,4 +104,39 @@ class AgentProfileRepository {
       SetOptions(merge: true),
     );
   }
+
+  Future<List<AgentFieldData>> fetchAllAgents() async {
+    final snapshot = await _db
+        .collection("users")
+        .where("tag", isEqualTo: "agent")
+        .get();
+
+    print("Found ${snapshot.docs.length} agent docs");
+
+    List<AgentFieldData> agents = [];
+    for (var doc in snapshot.docs) {
+      try {
+        final setupDoc = await _db
+            .collection("users")
+            .doc(doc.id)
+            .collection("agentProfile")
+            .doc("profile")
+            .get();
+
+        print("User ${doc.id} root: ${doc.data()}");
+        print("User ${doc.id} setup: ${setupDoc.data()}");
+
+        agents.add(AgentFieldData.fromFirestore(
+          doc.data(),
+          setupDoc.data() ?? {},
+        ));
+      } catch (e) {
+        print("Error parsing agent ${doc.id}: $e");
+      }
+    }
+    return agents;
+  }
+
+
+
 }

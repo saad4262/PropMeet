@@ -10,6 +10,7 @@ import 'package:propmeet/shared/utils/responsive_utils.dart';
 
 import 'home_custom_widgets/card_items.dart';
 import 'home_custom_widgets/loading_animation.dart';
+
 class HomeView extends StatelessWidget {
   HomeView({super.key});
 
@@ -23,7 +24,7 @@ class HomeView extends StatelessWidget {
         title: 'App Name',
         trailing: IconButton(
           onPressed: () {
-Get.offAllNamed(AppRoutes.filterPage);
+            Get.offAllNamed(AppRoutes.filterPage);
           },
           icon: Icon(Icons.menu, color: AppColors.primary),
         ),
@@ -41,7 +42,6 @@ Get.offAllNamed(AppRoutes.filterPage);
                 ),
                 child: Obx(() {
                   if (controller.isLoading.value) {
-
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -73,9 +73,7 @@ Get.offAllNamed(AppRoutes.filterPage);
                           Text(
                             'John, We are finding local agents \nfor you right now',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: Responsive.fontSize(4),
-                            ),
+                            style: TextStyle(fontSize: Responsive.fontSize(4)),
                           ),
                         ],
                       ),
@@ -95,8 +93,9 @@ Get.offAllNamed(AppRoutes.filterPage);
                     cardBuilder: (context, index, percentX, percentY) {
                       final card = controller.currentCards[index];
                       return Obx(() {
-                        final isLiked =
-                        controller.likedNames.contains(card['name']);
+                        final isLiked = controller.likedNames.contains(
+                          card['name'],
+                        );
                         final swipeAction = controller.swipeAction.value;
                         final swipedCardName = controller.swipedCardName.value;
 
@@ -108,13 +107,13 @@ Get.offAllNamed(AppRoutes.filterPage);
                         final shouldAnimateLike =
                             (previewAction == SwipeAction.like &&
                                 previewName == card['name']) ||
-                                (swipeAction == SwipeAction.like &&
-                                    swipedCardName == card['name']);
+                            (swipeAction == SwipeAction.like &&
+                                swipedCardName == card['name']);
                         final shouldAnimateDislike =
                             (previewAction == SwipeAction.dislike &&
                                 previewName == card['name']) ||
-                                (swipeAction == SwipeAction.dislike &&
-                                    swipedCardName == card['name']);
+                            (swipeAction == SwipeAction.dislike &&
+                                swipedCardName == card['name']);
 
                         return CardItem(
                           name: card['name']!,
@@ -122,11 +121,12 @@ Get.offAllNamed(AppRoutes.filterPage);
                           distance: card['distance']!,
                           progress: controller.progress.value,
                           isLiked: isLiked,
-                          swipeAction: shouldAnimateLike
-                              ? SwipeAction.like
-                              : shouldAnimateDislike
-                              ? SwipeAction.dislike
-                              : SwipeAction.none,
+                          swipeAction:
+                              shouldAnimateLike
+                                  ? SwipeAction.like
+                                  : shouldAnimateDislike
+                                  ? SwipeAction.dislike
+                                  : SwipeAction.none,
                           swipedCardName: card['name']!,
                           previewAction: previewAction,
                           previewName: previewName,
@@ -146,10 +146,15 @@ Get.offAllNamed(AppRoutes.filterPage);
                   Positioned(
                     left: 50,
                     bottom: 10,
-                    child: _buildIconButton(Icons.close, AppColors.goldenBackgroundColor, () {
-                      controller.swiperController
-                          .swipe(CardSwiperDirection.left);
-                    }),
+                    child: _buildIconButton(
+                      Icons.close,
+                      AppColors.goldenBackgroundColor,
+                      () {
+                        controller.swiperController.swipe(
+                          CardSwiperDirection.left,
+                        );
+                      },
+                    ),
                   ),
                   // Positioned(
                   //   left: 0,
@@ -167,7 +172,11 @@ Get.offAllNamed(AppRoutes.filterPage);
                   Positioned(
                     right: 50,
                     bottom: 10,
-                    child: _buildIconButton(Icons.check, AppColors.primary, () {}),
+                    child: _buildIconButton(
+                      Icons.check,
+                      AppColors.primary,
+                      () {},
+                    ),
                   ),
                 ],
               );

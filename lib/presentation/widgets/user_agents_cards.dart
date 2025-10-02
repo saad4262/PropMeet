@@ -37,7 +37,7 @@ class UserAgentsCards extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Image.asset(
-                imagePath ?? AppAssets.user1,
+                imagePath ?? AppAssets.user2,
                 fit: BoxFit.cover,
               ),
             ),
@@ -72,13 +72,14 @@ class UserAgentsCards extends StatelessWidget {
                     Text(
                       name ?? 'Default Name',
                       style: TextStyle(
-                        fontSize: Responsive.fontSize(4.5),
+                        fontSize: Responsive.fontSize(2.5),
                         fontWeight: FontWeight.bold,
                         color: AppColors.white,
                       ),
                     ),
                     Text(
-                      distance ?? '5 km away',
+                      //distance ?? '5 km away',
+    '5 km away',
                       style: TextStyle(
                         fontSize: Responsive.fontSize(3.5),
                         color: Colors.white70,
@@ -90,8 +91,8 @@ class UserAgentsCards extends StatelessWidget {
                 if (isVerified?? true)
                   Image.asset(
                     AppAssets.verifiedIcon,
-                    width: 28,
-                    height: 28,
+                    width: 20,
+                    height: 20,
                   ),
               ],
             ),

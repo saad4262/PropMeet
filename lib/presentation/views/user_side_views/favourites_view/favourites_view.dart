@@ -11,58 +11,58 @@ import '../../../widgets/user_agents_cards.dart';
 class FavouritesView extends StatelessWidget {
   FavouritesView({super.key});
 
-
-  final List<Map<String, dynamic>> agents = [
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user1,
-      "isVerified": true,
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user2,
-      "isVerified": true,
-    },
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user3,
-      "isVerified": true,
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user4,
-      "isVerified": true,
-    },
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user1,
-
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user2,
-      "isVerified": true,
-
-    },
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user3,
-      "isVerified": true,
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user4,
-      "isVerified": false,
-    },
-  ];
+  //
+  // final List<Map<String, dynamic>> agents = [
+  //   {
+  //     "name": "John Doe",
+  //     "subtitle": "3 km away",
+  //     "image": AppAssets.user1,
+  //     "isVerified": true,
+  //   },
+  //   {
+  //     "name": "Sarah Khan",
+  //     "subtitle": "5 km away",
+  //     "image": AppAssets.user2,
+  //     "isVerified": true,
+  //   },
+  //   {
+  //     "name": "John Doe",
+  //     "subtitle": "3 km away",
+  //     "image": AppAssets.user3,
+  //     "isVerified": true,
+  //   },
+  //   {
+  //     "name": "Sarah Khan",
+  //     "subtitle": "5 km away",
+  //     "image": AppAssets.user4,
+  //     "isVerified": true,
+  //   },
+  //   {
+  //     "name": "John Doe",
+  //     "subtitle": "3 km away",
+  //     "image": AppAssets.user1,
+  //
+  //   },
+  //   {
+  //     "name": "Sarah Khan",
+  //     "subtitle": "5 km away",
+  //     "image": AppAssets.user2,
+  //     "isVerified": true,
+  //
+  //   },
+  //   {
+  //     "name": "John Doe",
+  //     "subtitle": "3 km away",
+  //     "image": AppAssets.user3,
+  //     "isVerified": true,
+  //   },
+  //   {
+  //     "name": "Sarah Khan",
+  //     "subtitle": "5 km away",
+  //     "image": AppAssets.user4,
+  //     "isVerified": false,
+  //   },
+  // ];
 
   final FavouriteViewController controller=Get.find();
 

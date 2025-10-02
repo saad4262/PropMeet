@@ -1,69 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:propmeet/domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
-import 'package:propmeet/presentation/widgets/user_agents_cards.dart';
-import 'package:propmeet/shared/constants/app_colors.dart';
-import 'package:propmeet/shared/utils/responsive_utils.dart';
+import 'package:get/get_core/src/get_main.dart';
 
+import '../../../../domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
 import '../../../../shared/config/app_assets/app_assets.dart';
+import '../../../../shared/constants/app_colors.dart';
+import '../../../../shared/utils/responsive_utils.dart';
 import '../../../widgets/custom_user_appBar.dart';
+import '../../../widgets/user_agents_cards.dart';
 
 class TopAgentView extends StatelessWidget {
   TopAgentView({super.key});
 
-  final List<Map<String, dynamic>> agents = [
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user1,
-      "isVerified": true,
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user2,
-      "isVerified": true,
-    },
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user3,
-      "isVerified": true,
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user4,
-      "isVerified": true,
-    },
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user1,
-
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user2,
-      "isVerified": true,
-
-    },
-    {
-      "name": "John Doe",
-      "subtitle": "3 km away",
-      "image": AppAssets.user3,
-      "isVerified": true,
-    },
-    {
-      "name": "Sarah Khan",
-      "subtitle": "5 km away",
-      "image": AppAssets.user4,
-      "isVerified": false,
-    },
-  ];
-
-  final TopAgentViewController controller = Get.find();
+  final TopAgentViewController controller = Get.put(TopAgentViewController());
 
   @override
   Widget build(BuildContext context) {
@@ -92,29 +42,45 @@ class TopAgentView extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: Responsive.height(2),),
+                  SizedBox(height: Responsive.height(2)),
 
                   Expanded(
-                    child: GridView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.8,
-                          ),
-                      itemCount: agents.length,
-                      itemBuilder: (context, index) {
-                        final agent = agents[index];
-                        return UserAgentsCards(
-                          imagePath: agent["image"],
-                          name: agent["name"],
-                          distance: agent["subtitle"],
-                          isVerified: agent["isVerified"],
-                        );
-                      },
-                    ),
+                    child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (controller.agents.isEmpty) {
+                        return Center(child: Text("No agents found", style: TextStyle(fontSize: Responsive.fontSize(4)),));
+                      }
+
+                      return GridView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemCount: controller.agents.length,
+                        itemBuilder: (context, index) {
+                          final agent = controller.agents[index];
+
+                          // Build display name (first + last)
+                          final displayName = "${agent.firstName} ${agent.lastName}".trim().isEmpty
+                              ? "Unknown"
+                              : "${agent.firstName} ${agent.lastName}".trim();
+
+                          return UserAgentsCards(
+                            imagePath: (agent.profileImage.isNotEmpty)
+                                ? agent.profileImage
+                                : AppAssets.user1,
+                            name: displayName,
+                            distance: "Hi", // static text
+                            isVerified: true,
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ],
               ),

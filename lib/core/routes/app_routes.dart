@@ -24,6 +24,7 @@ abstract class AppRoutes {
   static const agentSubscriptionPlan='/agentSubscriptionPlan';
   //just for logout
   static const filterPage='/filterPage';
+  static const agentEditProfileView='/agentEditProfileView';
 
 
 }

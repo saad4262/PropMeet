@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_all_users_controller/top_user_controller.dart';
+import '../../../../shared/config/app_assets/app_assets.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/utils/responsive_utils.dart';
 import '../../../widgets/custom_user_appBar.dart';
@@ -54,8 +55,8 @@ class TopUsersView extends StatelessWidget {
                         gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 2,
+                          mainAxisSpacing: 2,
                           childAspectRatio: 0.8,
                         ),
                         itemCount: controller.users.length,
@@ -75,59 +76,93 @@ class TopUsersView extends StatelessWidget {
     );
   }
 }
-
 class _UserCard extends StatelessWidget {
   final dynamic user;
   const _UserCard({required this.user});
 
+  String _extractNameFromEmail(String email) {
+    if (email.isEmpty) return "User";
+    return email.split("@").first;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayName = user.name?.isNotEmpty == true
+        ? user.name!
+        : _extractNameFromEmail(user.email);
+
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16),
+          color: AppColors.primary,
         ),
+        padding: const EdgeInsets.all(12),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Circle with first letter of email
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.blueAccent,
-              child: Text(
-                user.email.isNotEmpty ? user.email[0].toUpperCase() : "?",
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            SizedBox(height: Responsive.height(5)),
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.goldenBackgroundColor,
+                    width: 5,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppColors.primary,
+                  child: Text(
+                    displayName.isNotEmpty ? displayName[0].toUpperCase() : "?",
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
 
-            // Name or Email
-            Text(
-              user.name?.isNotEmpty == true ? user.name! : user.email,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+            SizedBox(height: Responsive.height(1.5)),
+            Padding(
+              padding: const EdgeInsets.only(left: 6, bottom: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        displayName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(width: Responsive.width(2)),
+                      Image.asset(
+                        AppAssets.verifiedIcon,
+                        color: AppColors.goldenBackgroundColor,
+                        width: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "lahore",
+                 //   user.location.isNotEmpty ? user.location : "Unknown location",
+                    style: TextStyle(
+                      color: Colors.grey.shade300,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-
-            // Location (instead of km away, show user.location)
-            Text(
-              user.location.isNotEmpty ? user.location : "Unknown location",
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade600,
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:custom_cached_image/custom_cached_image_with_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_profile_view_controller.dart';
 
 import '../../../../domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
@@ -155,7 +156,9 @@ class AgentProfileCard extends StatelessWidget {
                         return Row(
                           children: [
                             Text(
-                              user.firstName ?? "-",
+                              (user.firstName ?? "-").length > 7
+                                  ? (user.firstName ?? "-").substring(0, 7)
+                                  : (user.firstName ?? "-"),
                               style: TextStyle(
                                 fontSize: Responsive.fontSize(4),
                                 fontWeight: FontWeight.bold,
@@ -164,13 +167,16 @@ class AgentProfileCard extends StatelessWidget {
                             ),
                             SizedBox(width: Responsive.width(1)),
                             Text(
-                              user.lastName ?? "-",
+                              (user.lastName ?? "-").length > 7
+                                  ? (user.lastName ?? "-").substring(0, 7)
+                                  : (user.lastName ?? "-"),
                               style: TextStyle(
                                 fontSize: Responsive.fontSize(4),
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.black,
                               ),
                             ),
+
                           ],
                         );
                       }),
@@ -189,7 +195,9 @@ class AgentProfileCard extends StatelessWidget {
                     height: 40,
                     text: "Edit Profile",
                     icon: Icons.edit,
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed(AppRoutes.agentEditProfileView);
+                    },
                   ),
                 ],
               ),

@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
-import 'package:propmeet/data/repositories/user_side_repository/user_profile_repo.dart';
-import 'package:propmeet/model/user_model/user_model.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+
+import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
+import '../../../../model/user_model/user_model.dart';
 
 class TopUserController extends GetxController {
   final UserProfileRepository repository = UserProfileRepository();
@@ -17,7 +19,7 @@ class TopUserController extends GetxController {
   Future<void> fetchUsers() async {
     try {
       isLoading.value = true;
-      final fetchedUsers = await repository.fetchAllUsers();
+      final fetchedUsers = await repository.fetchUsersByTag("user");
       users.assignAll(fetchedUsers);
     } catch (e) {
       print("Error fetching users: $e");

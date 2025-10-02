@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import '../../../model/agent_model/agent_model.dart';
 import '../../../model/user_model/user_model.dart';
 
 class UserProfileRepository {
@@ -20,7 +20,7 @@ class UserProfileRepository {
         .get();
 
     if (userDoc.exists && setupDoc.exists) {
-      return UserModel.fromFirestore(userDoc.data()!, setupDoc.data()!);
+      return UserModel.fromFirestore(userDoc, setupDoc.data()!);
     }
     return null;
   }
@@ -61,13 +61,8 @@ class UserProfileRepository {
             .doc("setupData")
             .get();
 
-        final rootData = doc.data();
         final setupData = setupDoc.data() ?? {};
-
-        // Debug log
-        print("Fetched user: ${doc.id}, setup exists: ${setupDoc.exists}");
-
-        users.add(UserModel.fromFirestore(rootData, setupData));
+        users.add(UserModel.fromFirestore(doc, setupData));
       } catch (e) {
         print("Error parsing user ${doc.id}: $e");
       }
@@ -75,16 +70,13 @@ class UserProfileRepository {
     return users;
   }
 
-
   Future<List<UserModel>> fetchAllUsersForCards() async {
     final snapshot = await _db.collection("users").get();
 
     List<UserModel> users = [];
-
     for (var doc in snapshot.docs) {
       final rootData = doc.data();
 
-      // ✅ Skip if user is tagged as agent
       if ((rootData["tag"] ?? "").toString().toLowerCase() == "agent") {
         continue;
       }
@@ -99,14 +91,65 @@ class UserProfileRepository {
       final setupData = setupDoc.data() ?? {};
 
       try {
-        final user = UserModel.fromFirestore(rootData, setupData);
-        users.add(user);
+        users.add(UserModel.fromFirestore(doc, setupData));
       } catch (e) {
         print("Error building UserModel for ${doc.id}: $e");
       }
     }
 
     return users;
+  }
+
+  Future<List<UserModel>> fetchUsersByTag(String tag) async {
+    final snapshot = await _db
+        .collection("users")
+        .where("tag", isEqualTo: tag)
+        .get();
+
+    List<UserModel> users = [];
+    for (var doc in snapshot.docs) {
+      try {
+        final setupDoc = await _db
+            .collection("users")
+            .doc(doc.id)
+            .collection("profile_user")
+            .doc("setupData")
+            .get();
+
+        final setupData = setupDoc.data() ?? {};
+        users.add(UserModel.fromFirestore(doc, setupData));
+      } catch (e) {
+        print("Error parsing user ${doc.id}: $e");
+      }
+    }
+    return users;
+  }
+
+  Future<List<AgentFieldData>> fetchAllAgents() async {
+    final snapshot = await _db
+        .collection("users")
+        .where("tag", isEqualTo: "agent")
+        .get();
+
+    List<AgentFieldData> agents = [];
+    for (var doc in snapshot.docs) {
+      try {
+        final setupDoc = await _db
+            .collection("users")
+            .doc(doc.id)
+            .collection("agentProfile")
+            .doc("profile")
+            .get();
+
+        agents.add(AgentFieldData.fromFirestore(
+          doc.data(),
+          setupDoc.data() ?? {},
+        ));
+      } catch (e) {
+        print("Error parsing agent ${doc.id}: $e");
+      }
+    }
+    return agents;
   }
 
 }

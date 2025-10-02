@@ -12,6 +12,7 @@ import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_bottom_ba
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_chat_view_controller/agent_chat_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_home_view_controller/agent_home_view_controller.dart';
+import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_edit_profile_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_profile_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_subscription_plan_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/chat_view_controller/chat_view_controller.dart';
@@ -20,6 +21,7 @@ import 'package:propmeet/domain/viewmodels/user_side_controller/home_controller/
 import 'package:propmeet/domain/viewmodels/user_side_controller/top_agent_view_controller/top_agent_view_controller.dart';
 import 'package:propmeet/domain/viewmodels/user_side_controller/user_profile_view_controller/user_profile_view_controller.dart';
 import 'package:propmeet/presentation/views/agent_bottom_bar_view/agent_bottom_bar_view.dart';
+import 'package:propmeet/presentation/views/agent_side_views/agent_profile_view/agent_edit_profile_view.dart';
 import 'package:propmeet/presentation/views/agent_side_views/agent_profile_view/agent_subscription_view.dart';
 import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
@@ -176,6 +178,15 @@ class AppPages {
       name: AppRoutes.filterPage,
       page: () => FilterPage(),
 
+    ),
+    GetPage(
+      name: AppRoutes.agentEditProfileView,
+      page: () => AgentEditProfileView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<AgentEditProfileViewController>(
+              () => AgentEditProfileViewController(),
+        );
+      }),
     ),
   ];
 }

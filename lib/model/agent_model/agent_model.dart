@@ -28,6 +28,11 @@ class AgentFieldData {
   final bool toggleLeaseRenewal;
   final bool toggleNegotiable;
 
+  //  Swipe-related fields (NEW)
+  final int swipeCount;
+  final List<String> liked;
+  final List<String> disliked;
+
   AgentFieldData({
     required this.apartmentAndUnit,
     this.createdAt,
@@ -54,6 +59,9 @@ class AgentFieldData {
     required this.serviceProvided,
     required this.toggleLeaseRenewal,
     required this.toggleNegotiable,
+    this.swipeCount = 0,
+    this.liked = const [],
+    this.disliked = const [],
   });
 
   factory AgentFieldData.fromFirestore(Map<String, dynamic> rootData, Map<String, dynamic> map) {
@@ -94,12 +102,13 @@ class AgentFieldData {
       serviceProvided: setSelection['What service do you provide to property owners?']?.toString() ?? '',
       toggleLeaseRenewal: rootData['toggleLeaseRenewal'] ?? false,
       toggleNegotiable: rootData['toggleNegotiable'] ?? false,
+
+      swipeCount: rootData['swipes']?['count'] ?? 0,
+      liked: rootData['swipes']?['liked'] != null ? List<String>.from(rootData['swipes']['liked']) : [],
+      disliked: rootData['swipes']?['disliked'] != null ? List<String>.from(rootData['swipes']['disliked']) : [],
     );
   }
 
-
-
-  /// Convert to Firestore structure
   Map<String, dynamic> toFirestore() {
     return {
       "fieldData": {
@@ -121,7 +130,7 @@ class AgentFieldData {
         "Off-the-Plan": offThePlan,
         "How many properties do you currently manage under rental agreements?": managedProperties,
         "How many properties have you sold in the last 12 months?": soldProperties,
-        "profileImage": profileImage, // lowercase p (as in Firestore)
+        "profileImage": profileImage,
       },
       "selectionsOption1": {
         "Fee Structure": feeStructure,
@@ -134,6 +143,12 @@ class AgentFieldData {
       },
       "toggleLeaseRenewal": toggleLeaseRenewal,
       "toggleNegotiable": toggleNegotiable,
+
+      "swipes": {
+        "count": swipeCount,
+        "liked": liked,
+        "disliked": disliked,
+      }
     };
   }
 }

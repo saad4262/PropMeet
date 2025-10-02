@@ -76,15 +76,16 @@ class AgentHomeView extends StatelessWidget {
 
                           return AgentCardWidget(
                             user: {
-                              "name": card.name,
+                              "name": card.email,
                               "email": card.email,
                             //  "image": card.profileImage,
-                              "location": card.location,
+                           //   "location": card.location,
+                              "location": "Lahore, Punjab",
                               "bedrooms": card.propertyDetails.bedrooms.toString(),
                               "bathrooms": card.propertyDetails.bathrooms.toString(),
                               "parking": card.propertyDetails.carSpaces.toString(),
                               "landSize": card.propertyDetails?.landSize?.toString(),
-                              "propertyType": card.propertyDetails?.value,
+                              "propertyType":card.selections[1].toString(),
                               "goal": (card.selections != null && card.selections!.isNotEmpty)
                                   ? card.selections![0]
                                   : null,
@@ -115,10 +116,10 @@ class AgentHomeView extends StatelessWidget {
               children: [
                 Positioned(
                   left: 50,
-                  bottom: 60,
+                  bottom: 30,
                   child: _buildIconButton(
                     Icons.close,
-                    AppColors.goldenBackgroundColor,
+                    Colors.red,
                         () {
                       controller.swiperController.swipe(CardSwiperDirection.left);
                     },
@@ -126,7 +127,7 @@ class AgentHomeView extends StatelessWidget {
                 ),
                 Positioned(
                   right: 50,
-                  bottom: 60,
+                  bottom: 30,
                   child: _buildIconButton(
                     Icons.check,
                     AppColors.primary,
@@ -154,7 +155,7 @@ class AgentHomeView extends StatelessWidget {
           color: AppColors.black,
           border: Border.all(color: color, width: 2),
         ),
-        child: Icon(icon, size: 35, color: color, fill: 1.0),
+        child: Icon(icon, size: 20, color: color, fill: 1.0),
       ),
     );
   }

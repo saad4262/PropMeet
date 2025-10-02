@@ -63,7 +63,7 @@ class AgentCardWidget extends StatelessWidget {
                                             width: 120,
                                             decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                color: Colors.grey.shade300,
+                                                // color: Colors.grey.shade300,
                                                 border: Border.all(
                                                     color: AppColors.goldenBackgroundColor,
                                                     width: 5,
@@ -92,17 +92,8 @@ class AgentCardWidget extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 8),
 
-                                        /// Name
-                                        Text(
-                                            user["name"] ?? "--",
-                                            style: TextStyle(
-                                                fontSize: Responsive.fontSize(4),
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                            ),
-                                        ),
 
-                                        /// Small card with distance + location
+
                                         SizedBox(
                                             height: 50,
                                             child: Card(
@@ -118,7 +109,7 @@ class AgentCardWidget extends StatelessWidget {
                                                                 user["email"] ?? "-- km",
                                                                 style: TextStyle(
                                                                     color: AppColors.white,
-                                                                    fontSize: Responsive.fontSize(1.5),
+                                                                    fontSize: Responsive.fontSize(2.5),
                                                                 ),
                                                             ),
                                                             Row(
@@ -148,31 +139,29 @@ class AgentCardWidget extends StatelessWidget {
                             ),
                         ),
 
-                        /// --- Bottom Section (Details + Goals) ---
                         Expanded(
                             flex: 6,
                             child: Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: SingleChildScrollView( // ✅ Prevent overflow
+                                child: SingleChildScrollView(
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-
-                                            /// Property Info Row
                                             Wrap(
-                                                spacing: 12,
-                                                runSpacing: 8,
-                                                alignment: WrapAlignment.start,
+                                                spacing: 20,
+                                                runSpacing: 10,
+                                                alignment: WrapAlignment.spaceEvenly,
                                                 children: [
-                                                    _infoRow(AppAssets.bedroomIcon, user["bedrooms"]),
-                                                    _infoRow(AppAssets.bathroomIcon, user["bathrooms"]),
-                                                    _infoRow(null, user["parking"],
+                                                    _infoRow(AppAssets.bedroomIcon, user["bedrooms"] ?? "--"),
+                                                    _infoRow(AppAssets.bathroomIcon, user["bathrooms"] ?? "--"),
+                                                    _infoRow(null, user["parking"] ?? "--",
                                                         icon: Icons.directions_car),
-                                                    _infoRow(AppAssets.landSizeIcon, user["landSize"]),
+                                                    _infoRow(AppAssets.landSizeIcon, user["landSize"] ?? "--"),
                                                     Text(
                                                         user["propertyType"] ?? "--",
                                                         style: TextStyle(
                                                             color: AppColors.grey.shade800,
+                                                            fontWeight: FontWeight.w600,
                                                             fontSize: Responsive.fontSize(3.5),
                                                         ),
                                                     ),
@@ -218,7 +207,7 @@ class AgentCardWidget extends StatelessWidget {
                     Icon(icon ?? Icons.help_outline, size: 20, color: AppColors.black),
                     const SizedBox(width: 4),
                     Text(value?.toString() ?? "--",
-                        style: TextStyle(fontSize: Responsive.fontSize(3.5))),
+                        style: TextStyle(fontSize: Responsive.fontSize(4))),
                 ],
             );
         }

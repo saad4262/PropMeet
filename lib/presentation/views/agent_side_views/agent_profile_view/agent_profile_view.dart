@@ -2,10 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_profile_view_controller.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import '../../../../domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
-import '../../../../shared/config/app_assets/app_assets.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';import '../../../../shared/config/app_assets/app_assets.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/utils/responsive_utils.dart';
 import '../../../widgets/agent_plan_card.dart';
@@ -100,7 +97,6 @@ class AgentProfileView extends StatelessWidget {
 
                       SizedBox(height: 10),
 
-                      // 🔑 Page Indicator
                       SmoothPageIndicator(
                         controller: _pageController,
                         count: 2,

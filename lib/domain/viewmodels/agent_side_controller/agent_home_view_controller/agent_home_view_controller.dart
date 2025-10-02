@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite_view_controller/agent_favourite_view_controller.dart';
 import 'package:propmeet/shared/constants/app_colors.dart';
 import '../../../../core/enum/enum.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../data/repositories/agent_side_repository/agent_side_home_repo.dart';
 import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
 import '../../../../model/user_model/user_model.dart';
 
@@ -55,6 +57,7 @@ import '../../../../model/user_model/user_model.dart';
 class AgentHomeViewController extends GetxController {
   final AgentFavouriteViewController favouriteController = Get.find();
   final UserProfileRepository _repository = UserProfileRepository();
+  final AgentSideHomeRepo repo = AgentSideHomeRepo();
   final CardSwiperController swiperController = CardSwiperController();
 
   // ✅ Use UserModel instead of Map
@@ -118,20 +121,76 @@ class AgentHomeViewController extends GetxController {
       startProgressTimer();
     }
   }
+  //
+  // @override
+  // bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
+  //   _progressTimer.cancel();
+  //
+  //   final swipedUser = currentCards[previousIndex];
+  //   this.currentIndex.value = currentIndex ?? previousIndex;
+  //   swipedCardName.value = swipedUser.name ?? "Unknown";
+  //
+  //   if (direction == CardSwiperDirection.right) {
+  //     likedNames.add(swipedUser.name ?? "");
+  //     swipeAction.value = SwipeAction.like;
+  //
+  //     // favouriteController.addToFavourites(swipedUser);
+  //
+  //     showSnackBar(swipedUser.name ?? "User", action: "like");
+  //   } else if (direction == CardSwiperDirection.left) {
+  //     swipeAction.value = SwipeAction.dislike;
+  //     showSnackBar(swipedUser.name ?? "User", action: "dislike");
+  //   }
+  //
+  //   Future.delayed(const Duration(milliseconds: 400), () {
+  //     swipeAction.value = SwipeAction.none;
+  //     swipedCardName.value = '';
+  //   });
+  //
+  //   if (this.currentIndex.value >= currentCards.length) {
+  //     showRefresh.value = true;
+  //     return true;
+  //   }
+  //
+  //   startProgressTimer();
+  //   return true;
+  // }
+  //
+  // void updateSwipePreview(double percentX, String cardName) {
+  //   if (percentX >= 0.2) {
+  //     swipePreviewDirection.value = SwipeAction.like;
+  //     swipePreviewCardName.value = cardName;
+  //   } else if (percentX <= -0.2) {
+  //     swipePreviewDirection.value = SwipeAction.dislike;
+  //     swipePreviewCardName.value = cardName;
+  //   } else {
+  //     swipePreviewDirection.value = SwipeAction.none;
+  //     swipePreviewCardName.value = '';
+  //   }
+  // }
+
 
   @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer.cancel();
 
     final swipedUser = currentCards[previousIndex];
-    this.currentIndex.value = currentIndex ?? previousIndex;
-    swipedCardName.value = swipedUser.name ?? "Unknown";
+    final agentId = "currentAgentId";
+    final userId = swipedUser.userId?? "";
 
     if (direction == CardSwiperDirection.right) {
       likedNames.add(swipedUser.name ?? "");
       swipeAction.value = SwipeAction.like;
 
-      // favouriteController.addToFavourites(swipedUser);
+      repo.addToFavourites(agentId, userId);
+
+      repo.firebaseService.checkMatch(agentId, userId).then((isMatch) {
+        if (isMatch) {
+          repo.firebaseService.saveMatch(agentId, userId);
+
+        //  Get.toNamed(AppRoutes.chat, arguments: {"agentId": agentId, "userId": userId});
+        }
+      });
 
       showSnackBar(swipedUser.name ?? "User", action: "like");
     } else if (direction == CardSwiperDirection.left) {
@@ -139,32 +198,9 @@ class AgentHomeViewController extends GetxController {
       showSnackBar(swipedUser.name ?? "User", action: "dislike");
     }
 
-    Future.delayed(const Duration(milliseconds: 400), () {
-      swipeAction.value = SwipeAction.none;
-      swipedCardName.value = '';
-    });
-
-    if (this.currentIndex.value >= currentCards.length) {
-      showRefresh.value = true;
-      return true;
-    }
-
-    startProgressTimer();
     return true;
   }
 
-  void updateSwipePreview(double percentX, String cardName) {
-    if (percentX >= 0.2) {
-      swipePreviewDirection.value = SwipeAction.like;
-      swipePreviewCardName.value = cardName;
-    } else if (percentX <= -0.2) {
-      swipePreviewDirection.value = SwipeAction.dislike;
-      swipePreviewCardName.value = cardName;
-    } else {
-      swipePreviewDirection.value = SwipeAction.none;
-      swipePreviewCardName.value = '';
-    }
-  }
 
   void showSnackBar(String name, {required String action}) {
     Color bgColor;
