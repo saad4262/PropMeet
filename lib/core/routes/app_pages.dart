@@ -154,7 +154,7 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.lazyPut<AgentBottomBarController>(() => AgentBottomBarController());
         Get.lazyPut<AgentFavouriteViewController>(
-              () => AgentFavouriteViewController(),
+          () => AgentFavouriteViewController(),
         );
         Get.lazyPut<AgentHomeViewController>(() => AgentHomeViewController());
         Get.lazyPut<TopUserController>(() => TopUserController());
@@ -174,17 +174,13 @@ class AppPages {
         );
       }),
     ),
-    GetPage(
-      name: AppRoutes.filterPage,
-      page: () => FilterPage(),
-
-    ),
+    GetPage(name: AppRoutes.filterPage, page: () => FilterPage()),
     GetPage(
       name: AppRoutes.agentEditProfileView,
       page: () => AgentEditProfileView(),
       binding: BindingsBuilder(() {
         Get.lazyPut<AgentEditProfileViewController>(
-              () => AgentEditProfileViewController(),
+          () => AgentEditProfileViewController(),
         );
       }),
     ),

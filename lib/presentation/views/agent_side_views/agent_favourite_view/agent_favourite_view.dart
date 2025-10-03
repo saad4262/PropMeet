@@ -11,10 +11,11 @@ import '../../../widgets/user_agents_cards.dart';
 class AgentFavouriteView extends StatelessWidget {
   AgentFavouriteView({super.key});
 
-  final AgentFavouriteViewController controller = Get.find();
+  final AgentFavouriteViewController controller = Get.put(AgentFavouriteViewController());
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: AppColors.goldenBackgroundColor,
       appBar: CustomUserAppbar(title: 'App Name'),
@@ -54,27 +55,19 @@ class AgentFavouriteView extends StatelessWidget {
                   Expanded(
                     child: Obx(() {
                       return GridView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                        itemCount: controller.favouriteUsers.length,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                           childAspectRatio: 0.8,
                         ),
-                        itemCount: controller.favouriteUsers.length,
                         itemBuilder: (context, index) {
                           final user = controller.favouriteUsers[index];
-
-                          // derive name from email (before @)
-                          final username = user.email.contains('@')
-                              ? user.email.split('@')[0]
-                              : user.email;
-
                           return UserAgentsCards(
-                            imagePath: AppAssets.user1,
-                            name: username,
-                            distance: "5 km away", // placeholder
+                            imagePath: AppAssets.user3,
+                            name: user.email.split('@')[0],
+                            distance: user.location.isNotEmpty ? user.location : "N/A",
                             isVerified: true,
                           );
                         },

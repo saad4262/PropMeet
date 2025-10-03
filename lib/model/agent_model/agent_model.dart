@@ -64,7 +64,12 @@ class AgentFieldData {
     this.disliked = const [],
   });
 
-  factory AgentFieldData.fromFirestore(Map<String, dynamic> rootData, Map<String, dynamic> map) {
+
+
+  factory AgentFieldData.fromFirestore(
+      Map<String, dynamic> rootData,
+      Map<String, dynamic> map,
+      ) {
     final setupData = map['fieldData'] ?? {};
     final selections1 = map['selectionsOption1'] ?? {};
     final selections2 = map['selectionsOption2'] ?? {};
@@ -74,6 +79,15 @@ class AgentFieldData {
     if (rootData['createdAt'] != null && rootData['createdAt'] is Timestamp) {
       DateTime dateTime = (rootData['createdAt'] as Timestamp).toDate();
       formattedDate = DateFormat('MM/dd/yyyy').format(dateTime);
+    }
+
+    // ✅ Fix function for Firebase URLs
+    String _fixFirebaseImageUrl(String? url) {
+      if (url == null || url.isEmpty) return '';
+      if (url.contains('.firebasestorage.app')) {
+        return url.replaceAll('.firebasestorage.app', '.appspot.com');
+      }
+      return url;
     }
 
     return AgentFieldData(
@@ -96,7 +110,10 @@ class AgentFieldData {
       offThePlan: setupData['Off-the-Plan']?.toString() ?? '',
       managedProperties: setupData['How many properties do you currently manage under rental agreements?']?.toString() ?? '',
       soldProperties: setupData['How many properties have you sold in the last 12 months?']?.toString() ?? '',
-      profileImage: setupData['profileImage']?.toString() ?? '',
+
+      // ✅ Apply fix here
+      profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString()),
+
       feeStructure: selections1['Fee Structure']?.toString() ?? '',
       feesNegotiable: selections2['Are your fees negotiable?']?.toString() ?? '',
       serviceProvided: setSelection['What service do you provide to property owners?']?.toString() ?? '',
@@ -104,8 +121,12 @@ class AgentFieldData {
       toggleNegotiable: rootData['toggleNegotiable'] ?? false,
 
       swipeCount: rootData['swipes']?['count'] ?? 0,
-      liked: rootData['swipes']?['liked'] != null ? List<String>.from(rootData['swipes']['liked']) : [],
-      disliked: rootData['swipes']?['disliked'] != null ? List<String>.from(rootData['swipes']['disliked']) : [],
+      liked: rootData['swipes']?['liked'] != null
+          ? List<String>.from(rootData['swipes']['liked'])
+          : [],
+      disliked: rootData['swipes']?['disliked'] != null
+          ? List<String>.from(rootData['swipes']['disliked'])
+          : [],
     );
   }
 

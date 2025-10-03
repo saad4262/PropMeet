@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
@@ -7,51 +8,10 @@ import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_favourite
 import 'package:propmeet/shared/constants/app_colors.dart';
 import '../../../../core/enum/enum.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../../data/repositories/agent_side_repository/agent_profile_repo.dart';
 import '../../../../data/repositories/agent_side_repository/agent_side_home_repo.dart';
 import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
 import '../../../../model/user_model/user_model.dart';
-
-// class AgentHomeViewController extends GetxController{
-//
-//   final AgentFavouriteViewController favouriteController = Get.find();
-//   final UserProfileRepository _repository = UserProfileRepository();
-//   final CardSwiperController swiperController = CardSwiperController();
-//   final RxInt currentIndex = 0.obs;
-//   final RxDouble progress = 0.0.obs;
-//
-//   late Timer _progressTimer;
-//
-//   final List<Map<String, String>> allUsers = [
-//     {'name': 'Ahmad', 'image': AppAssets.user1, 'distance': '13'},
-//     {'name': 'Ali', 'image':  AppAssets.user2,'distance': '2'},
-//     {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '130'},
-//     {'name': 'Ping', 'image':  AppAssets.user4,'distance': '120'},
-//     {'name': 'Ahmad', 'image': AppAssets.user1,'distance': '22'},
-//     {'name': 'Ali', 'image':  AppAssets.user2,'distance': '11'},
-//     {'name': 'Charlie', 'image':  AppAssets.user3,'distance': '13'},
-//     {'name': 'Ping', 'image':  AppAssets.user4,'distance': '223'},
-//   ];
-//
-//   final RxList<Map<String, String>> currentCards = <Map<String, String>>[].obs;
-//   final RxSet<String> likedNames = <String>{}.obs;
-//
-//   final RxBool isLoading = true.obs;
-//
-//   final RxBool showRefresh = false.obs;
-//
-//   AgentHomeViewController() {
-//     currentCards.value = List<Map<String, String>>.from(allUsers)..shuffle();
-//   }
-//
-//   var likeAnimationTrigger = false.obs; // this will trigger my heart wala icon
-//   var dislikeAnimationTrigger = false.obs;
-//   var swipeAction = SwipeAction.none.obs;
-//
-//   var swipedCardName = ''.obs;
-//
-//   var swipePreviewDirection = SwipeAction.none.obs;
-//   var swipePreviewCardName = ''.obs;
-
 
 
 class AgentHomeViewController extends GetxController {
@@ -60,7 +20,6 @@ class AgentHomeViewController extends GetxController {
   final AgentSideHomeRepo repo = AgentSideHomeRepo();
   final CardSwiperController swiperController = CardSwiperController();
 
-  // ✅ Use UserModel instead of Map
   final RxList<UserModel> currentCards = <UserModel>[].obs;
   final RxSet<String> likedNames = <String>{}.obs;
 
@@ -80,6 +39,7 @@ class AgentHomeViewController extends GetxController {
   void onInit() {
     super.onInit();
     fetchUsers();
+    startProgressTimer();
   }
 
   Future<void> fetchUsers() async {
@@ -175,29 +135,44 @@ class AgentHomeViewController extends GetxController {
     _progressTimer.cancel();
 
     final swipedUser = currentCards[previousIndex];
-    final agentId = "currentAgentId";
+    final agentId = FirebaseAuth.instance.currentUser?.uid ?? "";
+
     final userId = swipedUser.userId?? "";
 
     if (direction == CardSwiperDirection.right) {
       likedNames.add(swipedUser.name ?? "");
       swipeAction.value = SwipeAction.like;
 
+      // Save favourite
       repo.addToFavourites(agentId, userId);
 
+      // Record swipe
+      AgentProfileRepository().recordSwipe(
+        agentUserId: agentId,
+        currentUserId: userId,
+        liked: true,
+      );
+
+      // Check match
       repo.firebaseService.checkMatch(agentId, userId).then((isMatch) {
         if (isMatch) {
           repo.firebaseService.saveMatch(agentId, userId);
-
-        //  Get.toNamed(AppRoutes.chat, arguments: {"agentId": agentId, "userId": userId});
+          // Get.toNamed(AppRoutes.chat, arguments: {"agentId": agentId, "userId": userId});
         }
       });
 
       showSnackBar(swipedUser.name ?? "User", action: "like");
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
+
+      AgentProfileRepository().recordSwipe(
+        agentUserId: agentId,
+        currentUserId: userId,
+        liked: false,
+      );
+
       showSnackBar(swipedUser.name ?? "User", action: "dislike");
     }
-
     return true;
   }
 

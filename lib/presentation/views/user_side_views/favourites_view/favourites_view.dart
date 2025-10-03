@@ -11,60 +11,8 @@ import '../../../widgets/user_agents_cards.dart';
 class FavouritesView extends StatelessWidget {
   FavouritesView({super.key});
 
-  //
-  // final List<Map<String, dynamic>> agents = [
-  //   {
-  //     "name": "John Doe",
-  //     "subtitle": "3 km away",
-  //     "image": AppAssets.user1,
-  //     "isVerified": true,
-  //   },
-  //   {
-  //     "name": "Sarah Khan",
-  //     "subtitle": "5 km away",
-  //     "image": AppAssets.user2,
-  //     "isVerified": true,
-  //   },
-  //   {
-  //     "name": "John Doe",
-  //     "subtitle": "3 km away",
-  //     "image": AppAssets.user3,
-  //     "isVerified": true,
-  //   },
-  //   {
-  //     "name": "Sarah Khan",
-  //     "subtitle": "5 km away",
-  //     "image": AppAssets.user4,
-  //     "isVerified": true,
-  //   },
-  //   {
-  //     "name": "John Doe",
-  //     "subtitle": "3 km away",
-  //     "image": AppAssets.user1,
-  //
-  //   },
-  //   {
-  //     "name": "Sarah Khan",
-  //     "subtitle": "5 km away",
-  //     "image": AppAssets.user2,
-  //     "isVerified": true,
-  //
-  //   },
-  //   {
-  //     "name": "John Doe",
-  //     "subtitle": "3 km away",
-  //     "image": AppAssets.user3,
-  //     "isVerified": true,
-  //   },
-  //   {
-  //     "name": "Sarah Khan",
-  //     "subtitle": "5 km away",
-  //     "image": AppAssets.user4,
-  //     "isVerified": false,
-  //   },
-  // ];
+  final FavouriteViewController controller = Get.put(FavouriteViewController());
 
-  final FavouriteViewController controller=Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -86,27 +34,35 @@ class FavouritesView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'TOP AGENTS',
+                    'Liked User',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: Responsive.fontSize(6),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Center(
-                    child: Text(
-                      'agents that liked you',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: Responsive.fontSize(4),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: Text(
+                  //     'agents that liked you',
+                  //     style: TextStyle(
+                  //       color: AppColors.black,
+                  //       fontSize: Responsive.fontSize(4),
+                  //       fontWeight: FontWeight.w500,
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: Responsive.height(2),)
 ,
                   Expanded(
                     child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (controller.favouriteAgents.isEmpty) {
+                        return const Center(child: Text("No favourites yet",
+                        style: TextStyle(fontSize: 12),));
+                      }
+
                       return GridView.builder(
                         physics: const BouncingScrollPhysics(),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -119,15 +75,16 @@ class FavouritesView extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final agent = controller.favouriteAgents[index];
                           return UserAgentsCards(
-                            imagePath: agent["image"],
-                            name: agent["name"],
-                            distance: agent["distance"],
+                            imagePath: agent.profileImage,// later use profileImage field
+                            name: agent.firstName ?? "Unknown",
+                            distance: agent.land,
                             isVerified: true,
                           );
                         },
                       );
                     }),
                   ),
+
                 ],
               ),
             ),

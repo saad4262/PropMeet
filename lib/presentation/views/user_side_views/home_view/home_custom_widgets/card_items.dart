@@ -26,8 +26,32 @@ class CardItem extends StatelessWidget {
     required this.swipedCardName,
     Key? key,
     required this.previewAction,
-    required this.previewName, required this.distance,
+    required this.previewName,
+    required this.distance,
   }) : super(key: key);
+
+  Widget buildImage(String imagePath) {
+    if (imagePath.startsWith('http')) {
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stack) {
+          return Image.asset(AppAssets.user3, fit: BoxFit.cover, width: double.infinity);
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+    } else {
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,13 +67,8 @@ class CardItem extends StatelessWidget {
         children: [
           Expanded(
             flex: 4,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
+            child: buildImage(imagePath),
           ),
-
           Expanded(
             flex: 5,
             child: Padding(
@@ -80,7 +99,6 @@ class CardItem extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-
                   Expanded(
                     child: GridView.count(
                       shrinkWrap: true,
@@ -89,7 +107,7 @@ class CardItem extends StatelessWidget {
                       mainAxisSpacing: 8,
                       crossAxisSpacing: 8,
                       childAspectRatio: 1.2,
-                      children: [
+                      children: const [
                         CardProfileWidgets(
                           title: 'Experience',
                           subtitle: '5+ years',
@@ -128,6 +146,5 @@ class CardItem extends StatelessWidget {
     );
   }
 }
-
 
 enum SwipeAction { none, like, dislike }

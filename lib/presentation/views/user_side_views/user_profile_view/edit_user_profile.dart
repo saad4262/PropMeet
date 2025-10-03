@@ -20,19 +20,24 @@ class EditUserProfile extends StatelessWidget {
         elevation: 1,
         centerTitle: true,
         title: Text('Edit Profile', style: TextStyle(color: AppColors.black, fontSize: Responsive.fontSize(5), fontWeight: FontWeight.w600),),
+      actions: [
+        IconButton(onPressed: (){
+          controller.saveProfile;
+        }, icon: Icon(Icons.done, color: AppColors.primary,)),
+      ],
       ),
       body: Obx(() {
         if (controller.profile.value == null) {
           return const Center(child: CircularProgressIndicator());
         }
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+        //  padding: const EdgeInsets.all(16),
           child: Container(
-            padding: const EdgeInsets.all(16),
+           padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppColors.white,
               border: Border.all(color: AppColors.goldenBackgroundColor, width: 3),
-                borderRadius: BorderRadius.circular(10),
+             //   borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,20 +72,34 @@ class EditUserProfile extends StatelessWidget {
 
                 SizedBox(height: Responsive.height(2)),
 
-                PropertyDetailsSection(
-                  details: controller.profile.value!.propertyDetails,
-                  onUpdate: (field, value) {
-                    // Update Firestore or local controller here
-                    controller.updatePropertyDetail(field, value);
-                  },
-                ),
 
-                SizedBox(height: Responsive.height(2),)
-,                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: CustomButton(width: 200, height: 60, text: 'Svae Profile', onPressed: controller.saveProfile,),
-                ),
+
+                // PropertyDetailsSection(
+                //   details: controller.profile.value!.propertyDetails,
+                //   onUpdate: (field, value) {
+                //     // Update Firestore or local controller here
+                //     controller.updatePropertyDetail(field, value);
+                //   },
+                // ),
+
+
+// 🔽 Replace above with dynamic sections
+                ...controller.fieldOptions.entries.map((entry) {
+                  final field = entry.key;
+                  final options = entry.value;
+                  final selected = controller.propertyDetailsSelections[field]!;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: Responsive.height(2)),
+                      _buildChoiceSection(field, options, selected),
+                    ],
+                  );
+                }).toList(),
+
+
+
               ],
             ),
           ),
@@ -110,15 +129,15 @@ class EditUserProfile extends StatelessWidget {
           Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Wrap(
-            spacing: 3,
+            spacing: 5,
             children: options.map((option) {
               final isSelected = selected.value == option;
               return ChoiceChip(
-                elevation: 1,
+                elevation: 2,
                 label: Text(option,),
                 selected: isSelected,
                 onSelected: (_) => selected.value = option,
-                selectedColor: AppColors.goldenBackgroundColor
+                selectedColor: AppColors.primary.withOpacity(0.34)
               );
             }).toList(),
           ),

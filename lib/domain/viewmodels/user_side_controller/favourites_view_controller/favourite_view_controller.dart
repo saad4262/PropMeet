@@ -1,50 +1,38 @@
-// import 'package:get/get.dart';
-//
-// class FavouriteViewController extends GetxController{
-//   final RxList<Map<String, String>> favouriteAgents = <Map<String, String>>[].obs;
-//
-//   void addToFavourites(Map<String, String> agent) {
-//     if (!favouriteAgents.any((a) => a['name'] == agent['name'])) {
-//       favouriteAgents.add(agent);
-//     }
-//   }
-//
-//   void removeFromFavourites(String name) {
-//     favouriteAgents.removeWhere((a) => a['name'] == name);
-//   }
-// }
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../../../../data/repositories/user_side_repository/user_side_home_repo.dart';
+import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
+import '../../../../model/agent_model/agent_model.dart';
 
 class FavouriteViewController extends GetxController {
-  final RxList<Map<String, String>> favouriteAgents = <Map<String, String>>[].obs;
-  final UserRepository _repo = UserRepository();
+  final UserProfileRepository _repo = UserProfileRepository();
 
+  var favouriteAgents = <AgentFieldData>[].obs; // holds agents
+  var isLoading = false.obs;
 
-  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchFavouriteAgents();
+  }
 
-  void addToFavourites(Map<String, String> agent) async {
-    // local update
-    if (!favouriteAgents.any((a) => a['name'] == agent['name'])) {
-      favouriteAgents.add(agent);
+  Future<void> fetchFavouriteAgents() async {
+    try {
+      isLoading.value = true;
+      print("🚀 fetchFavouriteAgents() called");
+
+      // fetch favourites from repo
+      final agents = await _repo.fetchFavouriteAgents();
+      print("📦 Repo returned ${agents.length} favourites");
+
+      favouriteAgents.assignAll(agents.cast<AgentFieldData>());
+      print("✅ favouriteAgents updated: ${favouriteAgents.length}");
+    } catch (e) {
+      print("❌ Error fetching favourite agents: $e");
+      favouriteAgents.clear();
+    } finally {
+      isLoading.value = false;
+      print("🏁 fetchFavouriteAgents() finished");
     }
-
-    // Firestore update
-    await _repo.addToFavourites(userId, agent["id"] ?? agent["name"]!);
   }
 
-  void removeFromFavourites(String name, String agentId) async {
-    favouriteAgents.removeWhere((a) => a['name'] == name);
-    await _repo.removeFromFavourites(userId, agentId);
-  }
-
-
-  Future<void> loadFavourites() async {
-    final favIds = await _repo.fetchFavourites(userId);
-    // here you need to map favIds → agent details (fetch from agents collection maybe?)
-    // For now just print:
-    print("User favourites from Firestore: $favIds");
-  }
 }
