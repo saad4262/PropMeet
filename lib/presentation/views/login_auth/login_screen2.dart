@@ -8,8 +8,6 @@ import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
 
-import '../../../shared/config/app_assets/app_assets.dart';
-
 class LoginView2 extends StatelessWidget {
   LoginView2({super.key});
 
@@ -32,13 +30,13 @@ class LoginView2 extends StatelessWidget {
                 SizedBox(height: Responsive.height(10)),
 
                 SvgPicture.asset(
-                  AppAssets.homeIcon,
+                  AppImages.logo2,
+                  height: Responsive.height(12),
                   color: AppColors.blueMain,
-                  height: Responsive.height(10),
                 ),
                 SizedBox(height: Responsive.height(10)),
                 Obx(
-                  () => SizedBox(
+                      () => SizedBox(
                     width: Responsive.width(80),
                     height: Responsive.height(7),
                     child: Stack(
@@ -59,33 +57,33 @@ class LoginView2 extends StatelessWidget {
                           height: double.infinity,
                           child: ElevatedButton(
                             onPressed:
-                                authController.isLoading.value
-                                    ? null
-                                    : () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        authController.isLoading.value = true;
+                            authController.isLoading.value
+                                ? null
+                                : () async {
+                              if (_formKey.currentState!.validate()) {
+                                authController.isLoading.value = true;
 
-                                        await Future.delayed(
-                                          const Duration(seconds: 2),
-                                        );
+                                await Future.delayed(
+                                  const Duration(seconds: 2),
+                                );
 
-                                        bool success = await authController
-                                            .login(
-                                              _emailController.text.trim(),
-                                              _passwordController.text.trim(),
-                                            );
+                                bool success = await authController
+                                    .login(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
 
-                                        // await AppNotificationService.saveDeviceToken();
+                                // await AppNotificationService.saveDeviceToken();
 
-                                        authController.isLoading.value = false;
+                                authController.isLoading.value = false;
 
-                                        if (success) {
-                                          Get.offAllNamed(AppRoutes.bottomBarView);
-                                        } else {
-                                          Get.snackbar("Error", "Login failed");
-                                        }
-                                      }
-                                    },
+                                if (success) {
+                                  Get.offAllNamed(AppRoutes.bottomBarView);
+                                } else {
+                                  Get.snackbar("Error", "Login failed");
+                                }
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -96,25 +94,25 @@ class LoginView2 extends StatelessWidget {
                               ),
                             ),
                             child:
-                                authController.isLoading.value
-                                    ? const SizedBox.shrink()
-                                    : Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          AppImages.google,
-                                          height: Responsive.height(4),
-                                        ),
-                                        SizedBox(width: Responsive.width(7)),
-                                        const Text(
-                                          "Continue with Gmail",
-                                          style: TextStyle(
-                                            color: AppColors.blueMain,
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                            authController.isLoading.value
+                                ? const SizedBox.shrink()
+                                : Row(
+                              children: [
+                                SvgPicture.asset(
+                                  AppImages.google,
+                                  height: Responsive.height(4),
+                                ),
+                                SizedBox(width: Responsive.width(7)),
+                                const Text(
+                                  "Continue with Gmail",
+                                  style: TextStyle(
+                                    color: AppColors.blueMain,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
@@ -135,7 +133,7 @@ class LoginView2 extends StatelessWidget {
 
                 SizedBox(height: Responsive.height(2)),
                 Obx(
-                  () => SizedBox(
+                      () => SizedBox(
                     width: Responsive.width(80),
                     height: Responsive.height(7),
                     child: Stack(
@@ -156,33 +154,33 @@ class LoginView2 extends StatelessWidget {
                           height: double.infinity,
                           child: ElevatedButton(
                             onPressed:
-                                authController.isLoading.value
-                                    ? null
-                                    : () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        authController.isLoading.value = true;
+                            authController.isLoading.value
+                                ? null
+                                : () async {
+                              if (_formKey.currentState!.validate()) {
+                                authController.isLoading.value = true;
 
-                                        await Future.delayed(
-                                          const Duration(seconds: 2),
-                                        );
+                                await Future.delayed(
+                                  const Duration(seconds: 2),
+                                );
 
-                                        bool success = await authController
-                                            .login(
-                                              _emailController.text.trim(),
-                                              _passwordController.text.trim(),
-                                            );
+                                bool success = await authController
+                                    .login(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
 
-                                        // await AppNotificationService.saveDeviceToken();
+                                // await AppNotificationService.saveDeviceToken();
 
-                                        authController.isLoading.value = false;
+                                authController.isLoading.value = false;
 
-                                        if (success) {
-                                          Get.offAllNamed(AppRoutes.bottomBarView);
-                                        } else {
-                                          Get.snackbar("Error", "Login failed");
-                                        }
-                                      }
-                                    },
+                                if (success) {
+                                  Get.offAllNamed(AppRoutes.bottomBarView);
+                                } else {
+                                  Get.snackbar("Error", "Login failed");
+                                }
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -193,25 +191,25 @@ class LoginView2 extends StatelessWidget {
                               ),
                             ),
                             child:
-                                authController.isLoading.value
-                                    ? const SizedBox.shrink()
-                                    : Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          AppImages.facebook,
-                                          height: Responsive.height(4),
-                                        ),
-                                        SizedBox(width: Responsive.width(7)),
-                                        const Text(
-                                          "Continue with Facebook",
-                                          style: TextStyle(
-                                            color: AppColors.blueMain,
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                            authController.isLoading.value
+                                ? const SizedBox.shrink()
+                                : Row(
+                              children: [
+                                SvgPicture.asset(
+                                  AppImages.facebook,
+                                  height: Responsive.height(4),
+                                ),
+                                SizedBox(width: Responsive.width(7)),
+                                const Text(
+                                  "Continue with Facebook",
+                                  style: TextStyle(
+                                    color: AppColors.blueMain,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
@@ -232,7 +230,7 @@ class LoginView2 extends StatelessWidget {
 
                 SizedBox(height: Responsive.height(2)),
                 Obx(
-                  () => SizedBox(
+                      () => SizedBox(
                     width: Responsive.width(80),
                     height: Responsive.height(7),
                     child: Stack(
@@ -253,33 +251,33 @@ class LoginView2 extends StatelessWidget {
                           height: double.infinity,
                           child: ElevatedButton(
                             onPressed:
-                                authController.isLoading.value
-                                    ? null
-                                    : () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        authController.isLoading.value = true;
+                            authController.isLoading.value
+                                ? null
+                                : () async {
+                              if (_formKey.currentState!.validate()) {
+                                authController.isLoading.value = true;
 
-                                        await Future.delayed(
-                                          const Duration(seconds: 2),
-                                        );
+                                await Future.delayed(
+                                  const Duration(seconds: 2),
+                                );
 
-                                        bool success = await authController
-                                            .login(
-                                              _emailController.text.trim(),
-                                              _passwordController.text.trim(),
-                                            );
+                                bool success = await authController
+                                    .login(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
 
-                                        // await AppNotificationService.saveDeviceToken();
+                                // await AppNotificationService.saveDeviceToken();
 
-                                        authController.isLoading.value = false;
+                                authController.isLoading.value = false;
 
-                                        if (success) {
-                                          Get.offAllNamed(AppRoutes.home);
-                                        } else {
-                                          Get.snackbar("Error", "Login failed");
-                                        }
-                                      }
-                                    },
+                                if (success) {
+                                  Get.offAllNamed(AppRoutes.home);
+                                } else {
+                                  Get.snackbar("Error", "Login failed");
+                                }
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -290,25 +288,25 @@ class LoginView2 extends StatelessWidget {
                               ),
                             ),
                             child:
-                                authController.isLoading.value
-                                    ? const SizedBox.shrink()
-                                    : Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          AppImages.phone,
-                                          height: Responsive.height(4),
-                                        ),
-                                        SizedBox(width: Responsive.width(7)),
-                                        const Text(
-                                          "Continue with Phone",
-                                          style: TextStyle(
-                                            color: AppColors.blueMain,
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                            authController.isLoading.value
+                                ? const SizedBox.shrink()
+                                : Row(
+                              children: [
+                                SvgPicture.asset(
+                                  AppImages.phone,
+                                  height: Responsive.height(4),
+                                ),
+                                SizedBox(width: Responsive.width(7)),
+                                const Text(
+                                  "Continue with Phone",
+                                  style: TextStyle(
+                                    color: AppColors.blueMain,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
@@ -361,7 +359,7 @@ class LoginView2 extends StatelessWidget {
                 SizedBox(height: Responsive.height(8)),
 
                 Obx(
-                  () => SizedBox(
+                      () => SizedBox(
                     width: Responsive.width(80),
                     height: Responsive.height(7),
                     child: Stack(
@@ -390,15 +388,15 @@ class LoginView2 extends StatelessWidget {
                               ),
                             ),
                             child:
-                                authController.isLoading.value
-                                    ? const SizedBox.shrink() // Text hide loader ke waqt
-                                    : const Text(
-                                      "Continue with Email",
-                                      style: TextStyle(
-                                        color: AppColors.white,
-                                        fontFamily: 'Poppins',
-                                      ),
-                                    ),
+                            authController.isLoading.value
+                                ? const SizedBox.shrink() // Text hide loader ke waqt
+                                : const Text(
+                              "Continue with Email",
+                              style: TextStyle(
+                                color: AppColors.white,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
                           ),
                         ),
 
@@ -436,10 +434,10 @@ class LoginView2 extends StatelessWidget {
                           color: AppColors.blueMain,
                         ),
                         recognizer:
-                            TapGestureRecognizer()
-                              ..onTap = () {
-                                Get.toNamed(AppRoutes.signUp);
-                              },
+                        TapGestureRecognizer()
+                          ..onTap = () {
+                            Get.toNamed(AppRoutes.signUp);
+                          },
                       ),
                     ],
                   ),

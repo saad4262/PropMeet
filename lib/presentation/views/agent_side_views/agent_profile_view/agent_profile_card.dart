@@ -77,15 +77,35 @@ class AgentProfileCard extends StatelessWidget {
                         ? user.firstName[0].toUpperCase()
                         : "?";
 
+                    // return CircleAvatar(
+                    //   radius: 50,
+                    //   backgroundColor: Colors.grey,
+                    //   backgroundImage: profileImage.isNotEmpty
+                    //       ? NetworkImage(profileImage)
+                    //       : null,
+                    //   child: profileImage.isNotEmpty
+                    //       ? Image.network(profileImage, fit: BoxFit.cover)
+                    //       : Center(
+                    //     child: Text(
+                    //       initial,
+                    //       style: TextStyle(
+                    //         fontSize: Responsive.fontSize(15),
+                    //         fontWeight: FontWeight.bold,
+                    //         color: Colors.white,
+                    //       ),
+                    //     ),
+                    //   )
+                    // );
                     return CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.grey,
+                      backgroundColor: Colors.grey.shade400,
                       backgroundImage: profileImage.isNotEmpty
+                          ? (profileImage.startsWith('http')
                           ? NetworkImage(profileImage)
+                          : AssetImage(profileImage)) as ImageProvider
                           : null,
-                      child: profileImage.isNotEmpty
-                          ? Image.network(profileImage, fit: BoxFit.cover)
-                          : Center(
+                      child: profileImage.isEmpty
+                          ? Center(
                         child: Text(
                           initial,
                           style: TextStyle(
@@ -95,7 +115,10 @@ class AgentProfileCard extends StatelessWidget {
                           ),
                         ),
                       )
+                          : null,
                     );
+
+
                   })
 ,
 
@@ -266,3 +289,5 @@ class AgentProfileCard extends StatelessWidget {
     );
   }
 }
+
+

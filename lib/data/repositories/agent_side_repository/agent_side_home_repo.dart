@@ -5,23 +5,9 @@ import '../../../model/user_model/user_model.dart';
 class AgentSideHomeRepo {
   final AgentSideHomeServices firebaseService = AgentSideHomeServices();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  Future<void> addFavourite(String agentId, String userId) async {
-    final firestore = FirebaseFirestore.instance;
 
-    final favRef = firestore
-        .collection('agentProfile')
-        .doc(agentId)
-        .collection('favourites')
-        .doc(userId);
-
-    final userDoc = await firestore.collection('profile_user').doc(userId).get();
-
-    if (userDoc.exists) {
-      await favRef.set({
-        'email': userDoc['email'] ?? '',
-        'createdAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    }
+  Future<void> addToFavourites(String agentId, String userId) {
+    return firebaseService.addFavourite(agentId, userId);
   }
 
   Future<void> removeFromFavourites(String agentId, String userId) {

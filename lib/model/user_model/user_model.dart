@@ -67,40 +67,108 @@ class UserModel {
   //     disliked: rootData['swipes']?['disliked'] != null ? List<String>.from(rootData['swipes']['disliked']) : [],
   //   );
   // }
-
-  factory UserModel.fromMap(Map<String, dynamic> rootData, Map<String, dynamic> setupData, {String? userId}) {
+  //
+  // factory UserModel.fromMap(Map<String, dynamic> rootData, Map<String, dynamic> setupData, {String? userId}) {
+  //   String? formattedDate;
+  //   if (rootData['createdAt'] != null && rootData['createdAt'] is Timestamp) {
+  //     DateTime dateTime = (rootData['createdAt'] as Timestamp).toDate();
+  //     formattedDate = DateFormat('MM/dd/yyyy').format(dateTime);
+  //   }
+  //
+  //   return UserModel(
+  //     userId: userId ?? '',
+  //     createdAt: formattedDate,
+  //     name: rootData['name'] is Map
+  //         ? "${rootData['name']['first'] ?? ''} ${rootData['name']['last'] ?? ''}".trim()
+  //         : (rootData['name'] ?? ''),
+  //     email: rootData['email'] ?? '',
+  //     location: setupData['location'] ?? '',
+  //     progress: (setupData['progress'] is int)
+  //         ? setupData['progress']
+  //         : (setupData['progress'] as num?)?.toInt() ?? 0,
+  //     propertyDetails: setupData['propertyDetails'] != null
+  //         ? PropertyDetails.fromMap(Map<String, dynamic>.from(setupData['propertyDetails']))
+  //         : PropertyDetails(value: '', bathrooms: '', bedrooms: '', carSpaces: '', landSize: ''),
+  //     selections: setupData['selections'] != null
+  //         ? List<String>.from(setupData['selections'])
+  //         : [],
+  //     swipeCount: rootData['swipes']?['count'] ?? 0,
+  //     liked: rootData['swipes']?['liked'] != null
+  //         ? List<String>.from(rootData['swipes']['liked'])
+  //         : [],
+  //     disliked: rootData['swipes']?['disliked'] != null
+  //         ? List<String>.from(rootData['swipes']['disliked'])
+  //         : [],
+  //   );
+  // }
+  factory UserModel.fromMap(
+      Map<String, dynamic> rootData,
+      Map<String, dynamic> setupData, {
+        String? userId,
+      }) {
     String? formattedDate;
     if (rootData['createdAt'] != null && rootData['createdAt'] is Timestamp) {
       DateTime dateTime = (rootData['createdAt'] as Timestamp).toDate();
       formattedDate = DateFormat('MM/dd/yyyy').format(dateTime);
     }
 
+    // 🔥 Safely extract potential nested maps
+    final nameData = rootData['name'];
+    final emailData = rootData['email'];
+    final swipesData = rootData['swipes'];
+
+    // ✅ Safe fallback parsing
+    final String safeName = nameData is Map
+        ? "${nameData['first'] ?? ''} ${nameData['last'] ?? ''}".trim()
+        : (nameData ?? '');
+
+    final String safeEmail = emailData is Map
+        ? (emailData['address'] ?? emailData['email'] ?? '')
+        : (emailData ?? '');
+
+    final int safeSwipeCount = (swipesData is Map && swipesData['count'] != null)
+        ? (swipesData['count'] as num).toInt()
+        : 0;
+
+    final List<String> safeLiked = (swipesData is Map &&
+        swipesData['liked'] is List)
+        ? List<String>.from(swipesData['liked'])
+        : [];
+
+    final List<String> safeDisliked = (swipesData is Map &&
+        swipesData['disliked'] is List)
+        ? List<String>.from(swipesData['disliked'])
+        : [];
+
     return UserModel(
       userId: userId ?? '',
       createdAt: formattedDate,
-      name: rootData['name'] is Map
-          ? "${rootData['name']['first'] ?? ''} ${rootData['name']['last'] ?? ''}".trim()
-          : (rootData['name'] ?? ''),
-      email: rootData['email'] ?? '',
+      name: safeName,
+      email: safeEmail,
       location: setupData['location'] ?? '',
       progress: (setupData['progress'] is int)
           ? setupData['progress']
           : (setupData['progress'] as num?)?.toInt() ?? 0,
       propertyDetails: setupData['propertyDetails'] != null
-          ? PropertyDetails.fromMap(Map<String, dynamic>.from(setupData['propertyDetails']))
-          : PropertyDetails(value: '', bathrooms: '', bedrooms: '', carSpaces: '', landSize: ''),
+          ? PropertyDetails.fromMap(
+        Map<String, dynamic>.from(setupData['propertyDetails']),
+      )
+          : PropertyDetails(
+        value: '',
+        bathrooms: '',
+        bedrooms: '',
+        carSpaces: '',
+        landSize: '',
+      ),
       selections: setupData['selections'] != null
           ? List<String>.from(setupData['selections'])
           : [],
-      swipeCount: rootData['swipes']?['count'] ?? 0,
-      liked: rootData['swipes']?['liked'] != null
-          ? List<String>.from(rootData['swipes']['liked'])
-          : [],
-      disliked: rootData['swipes']?['disliked'] != null
-          ? List<String>.from(rootData['swipes']['disliked'])
-          : [],
+      swipeCount: safeSwipeCount,
+      liked: safeLiked,
+      disliked: safeDisliked,
     );
   }
+
 
 
   UserModel copyWith({

@@ -113,10 +113,12 @@ class AgentFieldData {
 
       // ✅ Apply fix here
       //profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString()),
-      profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString())
-          .isNotEmpty
-          ? _fixFirebaseImageUrl(setupData['profileImage']?.toString())
-          : "assets/images/user4.png",
+      profileImage: _fixFirebaseImageUrl(map['profile']?['profileImage'] ?? ''),
+
+      // profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString())
+      //     .isNotEmpty
+      //     ? _fixFirebaseImageUrl(setupData['profileImage']?.toString())
+      //     : "assets/images/user4.png",
 
 
       feeStructure: selections1['Fee Structure']?.toString() ?? '',

@@ -1,16 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:propmeet/data/repositories/map_repo.dart';
+import 'package:propmeet/model/mapmodel/map_model.dart';
+import 'package:propmeet/model/mapmodel/map_model.dart' as gmaps;
 import 'package:propmeet/shared/constants/app_images.dart';
 
 class ProfileSetup extends GetxController {
-  final int totalPages = 6;
+  final int totalPages = 5;
 
   var currentPage = 0.obs;
   late RxList<int?> selections;
   RxDouble progressPercent = 0.0.obs;
-  var selectedLocation = "Lahore, Punjab Pakistan".obs;
+  // var selectedLocation = "Lahore, Punjab Pakistan".obs;
+  final PlaceRepository _repository = PlaceRepository();
+
+  var searchResults = <PlaceSuggestion>[].obs;
+  var selectedLocation = LatLng(37.7749, -122.4194).obs; // Default SF
+  var markers = <Marker>{}.obs;
+  var selectedPlaceDetails = Rxn<gmaps.PlaceDetails>(); // Use the alias
+  GoogleMapController? mapController;
+  var isFetchingLocation = true.obs; // Track loading state
 
   // 🔹 User selected location
 
@@ -21,7 +35,7 @@ class ProfileSetup extends GetxController {
       "tags": ["Sell", "Rent"],
       "question": "What are you looking to do?",
       "subQuestion":
-          "Let us know your property goals so we can match you with the best agents",
+      "Let us know your property goals so we can match you with the best agents",
       "options": ["Sell My Home", "Rent My Property"],
       "subOptions": [
         "Find agents to help sell your property",
@@ -32,7 +46,7 @@ class ProfileSetup extends GetxController {
     {
       "question": "What type of property is it ?",
       "subQuestion":
-          "This helps us match you with agents who specialise in your property type.",
+      "This helps us match you with agents who specialise in your property type.",
       "options": ["Home", "Apartment", "Townhouse", "Land"],
       "subOptions": [
         "Detached or semi-detached home",
@@ -50,17 +64,12 @@ class ProfileSetup extends GetxController {
     {
       "question": "Where’s your property located?",
       "subQuestion":
-          "We will find the best local agents in your area, Then you can swipe to find the right one for you.",
-    },
-    {
-      "question": "Where’s your property located?",
-      "subQuestion":
-          "We will find the best local agents in your area, Then you can swipe to find the right one for you.",
+      "We will find the best local agents in your area, Then you can swipe to find the right one for you.",
     },
     {
       "question": "What’s your timeline?",
       "subQuestion":
-          "This helps us prioritise the most suitable agents and set the right expectations.",
+      "This helps us prioritise the most suitable agents and set the right expectations.",
       "options": [
         "Just Researching",
         "Selling in 3-6 Months",
@@ -76,7 +85,7 @@ class ProfileSetup extends GetxController {
     {
       "question": "A little more about your property.",
       "subQuestion":
-          "The more details you share, the smarter your agent matches.\nThis helps you connect with the right agents for your property needs. (You can skip this step if you’re not ready. Your profile will still be created.)",
+      "The more details you share, the smarter your agent matches.\nThis helps you connect with the right agents for your property needs. (You can skip this step if you’re not ready. Your profile will still be created.)",
       "fields": [
         {
           "title": "Bedrooms",
@@ -100,7 +109,7 @@ class ProfileSetup extends GetxController {
         },
       ],
       "note":
-          "Owners who shares more details get matched with better suited agents and receive more tailored response",
+      "Owners who shares more details get matched with better suited agents and receive more tailored response",
     },
   ];
 
@@ -108,6 +117,8 @@ class ProfileSetup extends GetxController {
   void onInit() {
     super.onInit();
     selections = RxList<int?>(List.filled(totalPages, null));
+    getUserCurrentLocation();
+
     // propertyDetails =
     //     <String, String?>{
     //       "Bedrooms": null,
@@ -129,9 +140,15 @@ class ProfileSetup extends GetxController {
   //   selections[pageIndex] = optionIndex;
   // }
 
-  void setSelection(int page, int? value) {
+  void setSelection(
+      int page,
+      int? value,
+      double? lat,
+      double? lng,
+      String? address,
+      ) {
     selections[page] = value;
-    saveProfileToFirestore(); // auto save on every change
+    saveProfileToFirestore(lat, lng, address);
   }
 
   void updatePage(int index) {
@@ -144,21 +161,188 @@ class ProfileSetup extends GetxController {
   //   selectedLocation.value = location;
   // }
 
-  void setPropertyDetail(String field, String value) {
+  void setPropertyDetail(
+      String field,
+      String value,
+      double? lat,
+      double? lng,
+      String? address,
+      ) {
     propertyDetails[field] = value;
-    saveProfileToFirestore(); // ✅ auto save on property detail update
+    saveProfileToFirestore(lat, lng, address);
   }
 
-  void setLocation(String? location) {
-    if (location == null || location.trim().isEmpty) {
-      selectedLocation.value = "Lahore, Punjab Pakistan";
-    } else {
-      selectedLocation.value = location;
+  // void setLocation(String? location) {
+  //   if (location == null || location.trim().isEmpty) {
+  //     selectedLocation.value = "Lahore, Punjab Pakistan";
+  //   } else {
+  //     selectedLocation.value = location;
+  //   }
+  //   saveProfileToFirestore(); // ✅ auto save on location update
+  // }
+
+  void searchPlaces(String query) async {
+    if (query.isEmpty) {
+      searchResults.clear();
+      return;
     }
-    saveProfileToFirestore(); // ✅ auto save on location update
+
+    try {
+      final results = await _repository.fetchPlaceSuggestions(query);
+      searchResults.assignAll(results);
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
-  Future<void> saveProfileToFirestore() async {
+  void selectPlace(String placeId) async {
+    try {
+      final gmaps.PlaceDetails details = await _repository.fetchPlaceDetails(
+        placeId,
+      );
+
+      selectedLocation.value = LatLng(details.lat, details.lng);
+      selectedPlaceDetails.value = details;
+
+      // Clear old markers before adding a new one
+      markers.clear();
+      markers.add(
+        Marker(
+          markerId: MarkerId(placeId),
+          position: selectedLocation.value,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueBlue,
+          ), // Change color
+
+          infoWindow: InfoWindow(title: details.name, snippet: details.address),
+        ),
+      );
+
+      markers.refresh(); // Ensure UI updates after marker changes
+
+      // Ensure the map controller is initialized
+      if (mapController != null) {
+        await mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: selectedLocation.value,
+              zoom: 14.0,
+              tilt: 30.0,
+              bearing: 0,
+            ),
+          ),
+        );
+      }
+
+      await Future.delayed(Duration(milliseconds: 500));
+      mapController?.showMarkerInfoWindow(MarkerId(placeId));
+
+      searchResults.clear();
+      searchResults.refresh(); // Ensure search UI updates
+
+      await saveProfileToFirestore(details.lat, details.lng, details.address);
+    } catch (e) {
+      print("Error selecting place: $e");
+    }
+  }
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   _getUserCurrentLocation();
+  // }
+
+  Future<void> getUserCurrentLocation() async {
+    try {
+      isFetchingLocation.value = true; // Start loading
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        isFetchingLocation.value = false;
+        return; // Handle permission denied case
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      selectedLocation.value = LatLng(position.latitude, position.longitude);
+
+      // Reverse Geocoding to get place name
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        selectedPlaceDetails.value = gmaps.PlaceDetails(
+          name: place.name ?? "Unknown Place",
+          address: "${place.street}, ${place.locality}, ${place.country}",
+          lat: position.latitude,
+          lng: position.longitude,
+        );
+      }
+
+      // Add marker for current location
+      markers.clear();
+      markers.add(
+        Marker(
+          markerId: MarkerId("current_location"),
+          position: selectedLocation.value,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          infoWindow: InfoWindow(
+            title: selectedPlaceDetails.value?.name ?? "Your Location",
+            snippet: selectedPlaceDetails.value?.address ?? "",
+          ),
+        ),
+      );
+
+      if (mapController != null) {
+        mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: selectedLocation.value, zoom: 14.0),
+          ),
+        );
+      }
+
+      isFetchingLocation.value = false; // Stop loading
+    } catch (e) {
+      isFetchingLocation.value = false;
+      print("Error fetching location: $e");
+    }
+  }
+
+  // Future<void> saveLocationToFirestore(double lat, double lng, String address) async {
+  //   try {
+  //     String uid = FirebaseAuth.instance.currentUser!.uid; // Get current user UID
+
+  //     await FirebaseFirestore.instance.collection("users").doc(uid).update({
+  //       "location": {
+  //         "latitude": lat,
+  //         "longitude": lng,
+  //         "address": address,
+  //       }
+  //     });
+
+  //     Get.snackbar("User Location", "Location Saved Successfully", backgroundColor: Colors.green);
+  //   } catch (e) {
+  //     print("Error saving location: $e");
+  //   }
+  // }
+
+  void setMapController(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  Future<void> saveProfileToFirestore(
+      double? lat,
+      double? lng,
+      String? address,
+      ) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
@@ -180,10 +364,11 @@ class ProfileSetup extends GetxController {
           return "";
         }),
 
-        "location":
-            selectedLocation.value.isEmpty
-                ? "Lahore, Punjab Pakistan"
-                : selectedLocation.value,
+        // "location":
+        //     selectedLocation.value.isEmpty
+        //         ? "Lahore, Punjab Pakistan"
+        //         : selectedLocation.value,
+        "location": {"latitude": lat, "longitude": lng, "address": address},
         "propertyDetails": Map<String, dynamic>.from(
           propertyDetails.map((k, v) => MapEntry(k, v ?? "")),
         ),

@@ -14,6 +14,7 @@ class AgentProfileViewController extends GetxController{
   void onInit() {
     super.onInit();
     loadProfile();
+
   }
 
   Future<void> loadProfile() async {

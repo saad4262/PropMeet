@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -129,18 +130,22 @@ class AgentHomeViewController extends GetxController {
   //   }
   // }
 
+
+  @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer.cancel();
 
     final swipedUser = currentCards[previousIndex];
     final agentId = FirebaseAuth.instance.currentUser?.uid ?? "";
-    final userId = swipedUser.userId ?? "";
+
+    final userId = swipedUser.userId?? "";
 
     if (direction == CardSwiperDirection.right) {
-      likedNames.add(swipedUser.email ?? "");
+      likedNames.add(swipedUser.name ?? "");
       swipeAction.value = SwipeAction.like;
 
-      repo.addFavourite(agentId, userId);
+      // Save favourite
+      repo.addToFavourites(agentId, userId);
 
       // Record swipe
       AgentProfileRepository().recordSwipe(
@@ -149,15 +154,15 @@ class AgentHomeViewController extends GetxController {
         liked: true,
       );
 
+      // Check match
       repo.firebaseService.checkMatch(agentId, userId).then((isMatch) {
         if (isMatch) {
           repo.firebaseService.saveMatch(agentId, userId);
-          // Optional: Navigate to chat or show match popup
           // Get.toNamed(AppRoutes.chat, arguments: {"agentId": agentId, "userId": userId});
         }
       });
 
-      showSnackBar(swipedUser.email ?? "Unknown", action: "like");
+      showSnackBar(swipedUser.email ?? "User", action: "like");
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
 
@@ -167,12 +172,21 @@ class AgentHomeViewController extends GetxController {
         liked: false,
       );
 
-      showSnackBar(swipedUser.email ?? "Unknown", action: "dislike");
+      showSnackBar(swipedUser.email ?? "User", action: "dislike");
     }
+
+    if ((currentIndex ?? previousIndex) >= currentCards.length - 1) {
+      // All cards swiped — auto refresh and restart progress
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        showRefresh.value = false;
+        await fetchUsers();
+        startProgressTimer();
+      });
+    }
+
 
     return true;
   }
-
 
 
   void showSnackBar(String email, {required String action}) {
