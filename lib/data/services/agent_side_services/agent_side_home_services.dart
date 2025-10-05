@@ -3,11 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AgentSideHomeServices {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<void> addFavourite(String agentId, String userId) async {
-    await _db.collection('agents').doc(agentId).update({
-      "favourites": FieldValue.arrayUnion([userId]),
-    });
-  }
+  // Future<void> addFavourite(String agentId, String userId) async {
+  //   await _db.collection('agents').doc(agentId).update({
+  //     "favourites": FieldValue.arrayUnion([userId]),
+  //   });
+  // }
 
   Future<void> removeFavourite(String agentId, String userId) async {
     await _db.collection('agents').doc(agentId).update({

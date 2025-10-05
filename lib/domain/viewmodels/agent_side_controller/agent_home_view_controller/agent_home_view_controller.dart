@@ -140,7 +140,7 @@ class AgentHomeViewController extends GetxController {
       likedNames.add(swipedUser.email ?? "");
       swipeAction.value = SwipeAction.like;
 
-      repo.addToFavourites(agentId, userId);
+      repo.addFavourite(agentId, userId);
 
       // Record swipe
       AgentProfileRepository().recordSwipe(

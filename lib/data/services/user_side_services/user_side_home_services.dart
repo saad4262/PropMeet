@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../push_services.dart';
 
 class UserSideHomeServices {
@@ -13,7 +12,7 @@ class UserSideHomeServices {
       final currentUser = _auth.currentUser;
       if (currentUser == null) return;
 
-      // 1️⃣ Save "liked" relationship (for current user)
+      // Save "liked" relationship
       await _firestore
           .collection('users')
           .doc(currentUserId)
@@ -21,7 +20,7 @@ class UserSideHomeServices {
           .doc(likedUserId)
           .set({'createdAt': FieldValue.serverTimestamp()});
 
-      // 2️⃣ Check if likedUser also liked currentUser → It's a match!
+      // Check for mutual like → Match
       final matchCheck = await _firestore
           .collection('users')
           .doc(likedUserId)
@@ -30,7 +29,7 @@ class UserSideHomeServices {
           .get();
 
       if (matchCheck.exists) {
-        // 🔥 Both liked each other — Create a match notification for both sides
+        // 🎉 It's a match!
         await _createNotification(
           toUserId: likedUserId,
           type: 'match',
@@ -64,7 +63,7 @@ class UserSideHomeServices {
     }
   }
 
-  // NOTE: put this inside UserSideHomeServices class (replace existing _createNotification)
+  /// 🛎 Create notification (safe version)
   Future<void> _createNotification({
     required String toUserId,
     required dynamic fromUser, // Firebase User or DocumentSnapshot
@@ -75,24 +74,20 @@ class UserSideHomeServices {
       String? fromName;
       String? fromEmail;
 
+      // Identify sender
       if (fromUser is User) {
         fromId = fromUser.uid;
         fromName = fromUser.displayName ?? fromUser.email ?? 'Someone';
         fromEmail = fromUser.email ?? '';
       } else if (fromUser is DocumentSnapshot) {
-        final data = fromUser.data() as Map<String, dynamic>?;
+        final data = fromUser.data() as Map<String, dynamic>? ?? {};
         fromId = fromUser.id;
-        fromName = data?['firstName'] ??
-            data?['name'] ??
-            data?['fullName'] ??
-            data?['email'] ??
-            'Someone';
-        fromEmail = data?['email'] ?? '';
+        fromName = data['firstName'] ?? data['name'] ?? data['email'] ?? 'Someone';
+        fromEmail = data['email'] ?? '';
       } else if (fromUser is String) {
-        // optional: if you pass just an id
-        fromId = fromUser;
-        final udoc = await FirebaseFirestore.instance.collection('users').doc(fromUser).get();
+        final udoc = await _firestore.collection('users').doc(fromUser).get();
         final ud = udoc.data() ?? {};
+        fromId = fromUser;
         fromName = ud['firstName'] ?? ud['name'] ?? ud['email'] ?? 'Someone';
         fromEmail = ud['email'] ?? '';
       }
@@ -106,50 +101,62 @@ class UserSideHomeServices {
         'read': false,
       };
 
-      // Save notification in Firestore (try users, then agentProfile)
-      final usersRef = FirebaseFirestore.instance.collection('users').doc(toUserId);
-      final agentRef = FirebaseFirestore.instance.collection('agentProfile').doc(toUserId);
+      // --- Save Notification ---
+      final usersRef = _firestore.collection('users').doc(toUserId);
+      final userDoc = await usersRef.get();
 
-      // prefer users collection
-      var receiverDoc = await usersRef.get();
-      if (receiverDoc.exists) {
+      if (userDoc.exists) {
         await usersRef.collection('notifications').add(notificationData);
       } else {
-        // fallback to agentProfile
-        receiverDoc = await agentRef.get();
-        if (receiverDoc.exists) {
-          await agentRef.collection('notifications').add(notificationData);
+        // fallback: nested agent profile path
+        final agentProfileRef = _firestore
+            .collection('users')
+            .doc(toUserId)
+            .collection('agentProfile')
+            .doc('profile');
+        final agentDoc = await agentProfileRef.get();
+
+        if (agentDoc.exists) {
+          await agentProfileRef.collection('notifications').add(notificationData);
         } else {
-          // if not found anywhere, still try to write to users path
+          // fallback to users anyway
           await usersRef.collection('notifications').add(notificationData);
         }
       }
 
-      // Now send FCM push if token exists (check both collections)
+      // --- Send Push Notification ---
       String? fcmToken;
-      if (receiverDoc.exists) {
-        final rd = receiverDoc.data() as Map<String, dynamic>? ?? {};
-        fcmToken = rd['fcmToken'] ?? rd['token'] ?? rd['pushToken'];
+
+      if (userDoc.exists) {
+        fcmToken = userDoc.data()?['fcmToken'] ??
+            userDoc.data()?['token'] ??
+            userDoc.data()?['pushToken'];
       } else {
-        // re-check users doc quickly
-        final recheck = await usersRef.get();
-        fcmToken = recheck.exists ? (recheck.data()?['fcmToken']) : null;
+        final agentProfileRef = _firestore
+            .collection('users')
+            .doc(toUserId)
+            .collection('agentProfile')
+            .doc('profile');
+        final agentDoc = await agentProfileRef.get();
+        if (agentDoc.exists) {
+          final data = agentDoc.data() ?? {};
+          fcmToken = data['fcmToken'] ?? data['token'] ?? data['pushToken'];
+        }
       }
 
-      if (fcmToken != null && fcmToken.toString().isNotEmpty) {
+      if (fcmToken != null && fcmToken.isNotEmpty) {
         final title = type == 'match' ? '🎉 It\'s a Match!' : '❤️ Someone liked you!';
         final body = type == 'match'
             ? '${fromName ?? 'Someone'} matched with you!'
             : '${fromName ?? 'Someone'} liked your profile!';
-        await sendPushMessage(token: fcmToken.toString(), title: title, body: body);
+        await sendPushMessage(token: fcmToken, title: title, body: body);
       }
     } catch (e, st) {
       print('⚠️ Error creating notification: $e\n$st');
     }
   }
 
-
-
+  // --- Favourites and Swipe Helpers ---
   Future<void> addFavourite(String userId, String agentId) async {
     await _firestore.collection("users").doc(userId).set({
       "swipes": {
