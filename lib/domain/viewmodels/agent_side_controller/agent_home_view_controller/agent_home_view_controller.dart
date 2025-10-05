@@ -129,21 +129,17 @@ class AgentHomeViewController extends GetxController {
   //   }
   // }
 
-
-  @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer.cancel();
 
     final swipedUser = currentCards[previousIndex];
     final agentId = FirebaseAuth.instance.currentUser?.uid ?? "";
-
-    final userId = swipedUser.userId?? "";
+    final userId = swipedUser.userId ?? "";
 
     if (direction == CardSwiperDirection.right) {
-      likedNames.add(swipedUser.name ?? "");
+      likedNames.add(swipedUser.email ?? "");
       swipeAction.value = SwipeAction.like;
 
-      // Save favourite
       repo.addToFavourites(agentId, userId);
 
       // Record swipe
@@ -153,15 +149,15 @@ class AgentHomeViewController extends GetxController {
         liked: true,
       );
 
-      // Check match
       repo.firebaseService.checkMatch(agentId, userId).then((isMatch) {
         if (isMatch) {
           repo.firebaseService.saveMatch(agentId, userId);
+          // Optional: Navigate to chat or show match popup
           // Get.toNamed(AppRoutes.chat, arguments: {"agentId": agentId, "userId": userId});
         }
       });
 
-      showSnackBar(swipedUser.name ?? "User", action: "like");
+      showSnackBar(swipedUser.email ?? "Unknown", action: "like");
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
 
@@ -171,13 +167,15 @@ class AgentHomeViewController extends GetxController {
         liked: false,
       );
 
-      showSnackBar(swipedUser.name ?? "User", action: "dislike");
+      showSnackBar(swipedUser.email ?? "Unknown", action: "dislike");
     }
+
     return true;
   }
 
 
-  void showSnackBar(String name, {required String action}) {
+
+  void showSnackBar(String email, {required String action}) {
     Color bgColor;
     IconData icon;
     String message;
@@ -185,15 +183,15 @@ class AgentHomeViewController extends GetxController {
     if (action == "like") {
       bgColor = AppColors.primary;
       icon = Icons.favorite;
-      message = "You liked $name";
+      message = "You liked $email";
     } else if (action == "dislike") {
       bgColor = Colors.red;
       icon = Icons.close;
-      message = "You disliked $name";
+      message = "You disliked $email";
     } else {
       bgColor = Colors.blue;
       icon = Icons.star;
-      message = "$name has been added to favourites 💙";
+      message = "$email has been added to favourites 💙";
     }
 
     Get.showSnackbar(

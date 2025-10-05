@@ -155,4 +155,38 @@ class SwipeRepository {
     // final receiverToken = (await receiverRef.get()).data()?['fcmToken'];
     // if (receiverToken != null) sendPush(receiverToken, type, senderName);
   }
+
+  Future<void> likeAgent(String agentId, String agentName, String userName, String userEmail) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final userId = user.uid;
+
+    // Save favourite relationship
+    await FirebaseFirestore.instance
+        .collection('profile_user')
+        .doc(userId)
+        .collection('favourites')
+        .doc(agentId)
+        .set({
+      'agentId': agentId,
+      'likedAt': FieldValue.serverTimestamp(),
+    });
+
+    // Create a notification for that agent
+    await FirebaseFirestore.instance
+        .collection('agentProfile')
+        .doc(agentId)
+        .collection('notifications')
+        .add({
+      'type': 'liked',
+      'fromId': userId,
+      'fromName': userName,
+      'fromEmail': userEmail,
+      'createdAt': FieldValue.serverTimestamp(),
+      'read': false,
+    });
+  }
+
+
 }

@@ -188,6 +188,7 @@
 // }
 
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -322,50 +323,6 @@ class HomeController extends GetxController {
       startProgressTimer();
     }
   }
-
-  // @override
-  // bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
-  //   _progressTimer?.cancel();
-  //
-  //   if (previousIndex < 0 || previousIndex >= currentCards.length) {
-  //     return true;
-  //   }
-  //
-  //   final swipedUser = currentCards[previousIndex];
-  //   this.currentIndex.value = currentIndex ?? previousIndex;
-  //   swipedCardName.value = swipedUser['name'] ?? '';
-  //
-  //   if (direction == CardSwiperDirection.right) {
-  //     likedNames.add(swipedUser['name'] ?? '');
-  //     swipeAction.value = SwipeAction.like;
-  //
-  //     // add to favourites controller (you already had this)
-  //    // favouriteController.addToFavourites(swipedUser);
-  //
-  //     // Optionally: update the agent doc with a "like" record — implement method in repo if needed
-  //     // await _agentRepo.addSwipeLikeForAgent(agentId: ..., userId: ...);
-  //
-  //     showSnackBar(swipedUser['name'] ?? '', action: "like");
-  //   } else if (direction == CardSwiperDirection.left) {
-  //     swipeAction.value = SwipeAction.dislike;
-  //     showSnackBar(swipedUser['name'] ?? '', action: "dislike");
-  //   }
-  //
-  //   Future.delayed(const Duration(milliseconds: 400), () {
-  //     swipeAction.value = SwipeAction.none;
-  //     swipedCardName.value = '';
-  //   });
-  //
-  //   if (this.currentIndex.value >= currentCards.length) {
-  //     showRefresh.value = true;
-  //     return true;
-  //   }
-  //
-  //   startProgressTimer();
-  //   return true;
-  // }
-
-
   @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer?.cancel();
@@ -385,18 +342,39 @@ class HomeController extends GetxController {
     }
 
     final SwipeRepository swipeRepo = SwipeRepository();
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
     if (direction == CardSwiperDirection.right) {
       likedNames.add(swipedUser['name'] ?? '');
       swipeAction.value = SwipeAction.like;
 
-      // Record swipe using new repository
+      // Record swipe in swipe collection (your existing logic)
       swipeRepo.recordSwipe(
         targetId: agentId,
         liked: true,
-        currentUserType: UserType.user, // CURRENT user is a regular user
-        targetType: UserType.agent,    // TARGET is an agent
+        currentUserType: UserType.user,
+        targetType: UserType.agent,
       ).catchError((e) => print('recordSwipe like error: $e'));
+
+      // ✅ NEW: Add to favourites collection in Firestore
+      if (currentUserId != null && currentUserId.isNotEmpty) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUserId)
+            .collection('favourites')
+            .doc(agentId)
+            .set({
+          'addedAt': FieldValue.serverTimestamp(),
+          'name': swipedUser['name'],
+          'image': swipedUser['image'],
+          'distance': swipedUser['distance'],
+        })
+            .then((_) => print('❤️ Added ${swipedUser['name']} to favourites'))
+            .catchError((e) => print('🔥 Error adding favourite: $e'));
+      }
+
+      // Optionally: update local FavouriteViewController immediately (no delay)
+      favouriteController.fetchFavouriteAgents();
 
       showSnackBar(swipedUser['name'] ?? '', action: "like");
 
@@ -417,50 +395,6 @@ class HomeController extends GetxController {
     return true;
   }
 
-  // @override
-  // bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
-  //   _progressTimer?.cancel();
-  //
-  //   if (previousIndex < 0 || previousIndex >= currentCards.length) {
-  //     return true;
-  //   }
-  //
-  //   final swipedUser = currentCards[previousIndex];
-  //   this.currentIndex.value = currentIndex ?? previousIndex;
-  //   swipedCardName.value = swipedUser['name'] ?? '';
-  //
-  //   final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-  //   final agentId = swipedUser['id'] ?? '';
-  //
-  //   if (direction == CardSwiperDirection.right) {
-  //     likedNames.add(swipedUser['name'] ?? '');
-  //     swipeAction.value = SwipeAction.like;
-  //
-  //     if (currentUserId.isNotEmpty && agentId.isNotEmpty) {
-  //       // call the new unified method that also notifies/checks match
-  //       final SwipeRepository swipeRepo = SwipeRepository();
-  //       swipeRepo.likeWithNotificationAndMatch(agentId).catchError((e) => print('likeWithNotification error: $e'));
-  //     } else {
-  //       print('Skipping recordSwipe — missing ids agent:$agentId current:$currentUserId');
-  //     }
-  //
-  //     showSnackBar(swipedUser['name'] ?? '', action: "like");
-  //   } else if (direction == CardSwiperDirection.left) {
-  //     swipeAction.value = SwipeAction.dislike;
-  //     // you already had recordSwipe for dislikes, keep it or add similar atomic op
-  //     if (currentUserId.isNotEmpty && agentId.isNotEmpty) {
-  //       userRepo.recordSwipe(
-  //         agentUserId: agentId,
-  //         currentUserId: currentUserId,
-  //         liked: false,
-  //       ).catchError((e) => print('recordSwipe error: $e'));
-  //     }
-  //     showSnackBar(swipedUser['name'] ?? '', action: "dislike");
-  //   }
-  //   startProgressTimer();
-  //   return true;
-  // }
-  //
 
 
   void updateSwipePreview(double percentX, String cardName) {
