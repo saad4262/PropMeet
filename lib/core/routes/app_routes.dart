@@ -25,6 +25,7 @@ abstract class AppRoutes {
   //just for logout
   static const filterPage='/filterPage';
   static const agentEditProfileView='/agentEditProfileView';
-
+  static const notificationScreenUser='/notificationScreenUser';
+  static const notificationScreenAgent='/notificationScreenAgent';
 
 }

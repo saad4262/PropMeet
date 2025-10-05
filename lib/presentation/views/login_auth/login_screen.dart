@@ -8,6 +8,8 @@ import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
 
+import '../../../shared/config/app_assets/app_assets.dart';
+
 class LoginView extends StatelessWidget {
   LoginView({super.key});
 
@@ -40,7 +42,8 @@ class LoginView extends StatelessWidget {
                 SizedBox(height: Responsive.height(4)),
 
                 SvgPicture.asset(
-                  AppImages.logo2,
+                    AppAssets.homeIcon,
+                  color: AppColors.blueMain,
                   height: Responsive.height(10),
                 ),
                 SizedBox(height: Responsive.height(5)),

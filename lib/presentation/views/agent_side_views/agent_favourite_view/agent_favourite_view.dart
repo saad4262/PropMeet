@@ -23,10 +23,10 @@ class AgentFavouriteView extends StatelessWidget {
         child: Center(
           child: Container(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.78,
+          //  height: MediaQuery.of(context).size.height * 0.78,
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(20),
+            //  borderRadius: BorderRadius.circular(20),
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

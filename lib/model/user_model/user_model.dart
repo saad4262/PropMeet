@@ -38,6 +38,36 @@ class UserModel {
   }
 
   // Use this when you already have a Map
+  // factory UserModel.fromMap(Map<String, dynamic> rootData, Map<String, dynamic> setupData, {String? userId}) {
+  //   String? formattedDate;
+  //   if (rootData['createdAt'] != null && rootData['createdAt'] is Timestamp) {
+  //     DateTime dateTime = (rootData['createdAt'] as Timestamp).toDate();
+  //     formattedDate = DateFormat('MM/dd/yyyy').format(dateTime);
+  //   }
+  //
+  //   return UserModel(
+  //     userId: userId ?? '',
+  //     createdAt: formattedDate,
+  //     name: rootData['name'] ?? '',
+  //     email: rootData['email'] ?? '',
+  //     location: setupData['location'] ?? '',
+  //     progress: (setupData['progress'] is int)
+  //         ? setupData['progress']
+  //         : (setupData['progress'] as num?)?.toInt() ?? 0,
+  //     propertyDetails: setupData['propertyDetails'] != null
+  //         ? PropertyDetails.fromMap(Map<String, dynamic>.from(setupData['propertyDetails']))
+  //         : PropertyDetails(value: '', bathrooms: '', bedrooms: '', carSpaces: '', landSize: ''),
+  //     selections: setupData['selections'] != null
+  //         ? List<String>.from(setupData['selections'])
+  //         : [],
+  //
+  //     // Swipes data (safe fallback if missing)
+  //     swipeCount: rootData['swipes']?['count'] ?? 0,
+  //     liked: rootData['swipes']?['liked'] != null ? List<String>.from(rootData['swipes']['liked']) : [],
+  //     disliked: rootData['swipes']?['disliked'] != null ? List<String>.from(rootData['swipes']['disliked']) : [],
+  //   );
+  // }
+
   factory UserModel.fromMap(Map<String, dynamic> rootData, Map<String, dynamic> setupData, {String? userId}) {
     String? formattedDate;
     if (rootData['createdAt'] != null && rootData['createdAt'] is Timestamp) {
@@ -48,7 +78,9 @@ class UserModel {
     return UserModel(
       userId: userId ?? '',
       createdAt: formattedDate,
-      name: rootData['name'] ?? '',
+      name: rootData['name'] is Map
+          ? "${rootData['name']['first'] ?? ''} ${rootData['name']['last'] ?? ''}".trim()
+          : (rootData['name'] ?? ''),
       email: rootData['email'] ?? '',
       location: setupData['location'] ?? '',
       progress: (setupData['progress'] is int)
@@ -60,13 +92,16 @@ class UserModel {
       selections: setupData['selections'] != null
           ? List<String>.from(setupData['selections'])
           : [],
-
-      // Swipes data (safe fallback if missing)
       swipeCount: rootData['swipes']?['count'] ?? 0,
-      liked: rootData['swipes']?['liked'] != null ? List<String>.from(rootData['swipes']['liked']) : [],
-      disliked: rootData['swipes']?['disliked'] != null ? List<String>.from(rootData['swipes']['disliked']) : [],
+      liked: rootData['swipes']?['liked'] != null
+          ? List<String>.from(rootData['swipes']['liked'])
+          : [],
+      disliked: rootData['swipes']?['disliked'] != null
+          ? List<String>.from(rootData['swipes']['disliked'])
+          : [],
     );
   }
+
 
   UserModel copyWith({
     String? userId,

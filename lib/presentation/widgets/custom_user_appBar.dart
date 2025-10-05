@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:propmeet/shared/config/app_assets/app_assets.dart';
 import '../../../shared/constants/app_colors.dart';
@@ -9,12 +8,14 @@ class CustomUserAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Widget? trailing;
   final VoidCallback? onLeadingPressed;
+  final VoidCallback? notification;
 
   const CustomUserAppbar({
     super.key,
     required this.title,
     this.trailing,
     this.onLeadingPressed,
+    this.notification,
   });
 
   @override
@@ -26,15 +27,21 @@ class CustomUserAppbar extends StatelessWidget implements PreferredSizeWidget {
         horizontal: Responsive.width(5),
         vertical: Responsive.height(1),
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.white,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
             offset: Offset(0, 2),
           ),
         ],
+        border: const Border(
+          bottom: BorderSide(
+            color: AppColors.goldenBackgroundColor,
+            width: 5,
+          ),
+        ),
       ),
       child: SafeArea(
         bottom: false,
@@ -43,11 +50,18 @@ class CustomUserAppbar extends StatelessWidget implements PreferredSizeWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             SvgPicture.asset(
-               AppAssets.homeIcon, width: 20
-               ,color: AppColors.primary,
-             ),
-              SizedBox(width: Responsive.width(4),),
+              // Leading icon
+              GestureDetector(
+                onTap: onLeadingPressed,
+                child: SvgPicture.asset(
+                  AppAssets.homeIcon,
+                  width: 22,
+                  color: AppColors.primary,
+                ),
+              ),
+              SizedBox(width: Responsive.width(4)),
+
+              // Title
               Expanded(
                 child: Text(
                   title,
@@ -59,11 +73,23 @@ class CustomUserAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
 
-              // Trailing (Filter icon or empty box to balance)
-              trailing ??
-                  SizedBox(
-                    width: Responsive.width(6), // keep symmetry if no trailing
-                  ),
+              // Trailing section (only show notification if callback provided)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (notification != null)
+                    IconButton(
+                      onPressed: notification,
+                      icon: const Icon(
+                        Icons.notifications,
+                        color: AppColors.primary,
+                      ),
+                    ),
+
+                  // Optional trailing widget
+                  if (trailing != null) trailing!,
+                ],
+              ),
             ],
           ),
         ),
@@ -72,5 +98,5 @@ class CustomUserAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

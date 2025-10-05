@@ -105,7 +105,7 @@ class AgentProfileRepository {
     );
   }
 
-  Future<List<AgentFieldData>> fetchAllAgents() async {
+  Future<List<AgentFieldData>> fetchAllAgentsForTopAgents() async {
     final snapshot = await _db
         .collection("users")
         .where("tag", isEqualTo: "agent")
@@ -136,6 +136,42 @@ class AgentProfileRepository {
     }
     return agents;
   }
+
+  // file: data/repositories/agent_side_repository/agent_profile_repo.dart
+  Future<List<Map<String, dynamic>>> fetchAllAgents() async {
+    final snapshot = await _db
+        .collection("users")
+        .where("tag", isEqualTo: "agent")
+        .get();
+
+    print("Found ${snapshot.docs.length} agent docs");
+
+    List<Map<String, dynamic>> agents = [];
+    for (var doc in snapshot.docs) {
+      try {
+        final setupDoc = await _db
+            .collection('users')
+            .doc(doc.id)
+            .collection('agentProfile')
+            .doc('profile')
+            .get();
+
+        final model = AgentFieldData.fromFirestore(
+          doc.data(),
+          setupDoc.data() ?? {},
+        );
+
+        agents.add({
+          'id': doc.id,
+          'agent': model,
+        });
+      } catch (e) {
+        print("Error parsing agent ${doc.id}: $e");
+      }
+    }
+    return agents;
+  }
+
 
   Future<void> recordSwipe({
     required String agentUserId,
@@ -181,6 +217,63 @@ class AgentProfileRepository {
   }
 
 
+  // Future<List<AgentFieldData>> fetchAgentsByIds(List<String> ids) async {
+  //   if (ids.isEmpty) return [];
+  //   final snapshot = await _db
+  //       .collection('users')
+  //       .where(FieldPath.documentId, whereIn: ids)
+  //       .get();
+  //
+  //   List<AgentFieldData> agents = [];
+  //   for (var doc in snapshot.docs) {
+  //     final setupDoc = await _db
+  //         .collection('users')
+  //         .doc(doc.id)
+  //         .collection('agentProfile')
+  //         .doc('profile')
+  //         .get();
+  //     agents.add(AgentFieldData.fromFirestore(doc.data(), setupDoc.data() ?? {}));
+  //   }
+  //   return agents;
+  // }
+// add inside AgentProfileRepository class
+
+  Future<List<AgentFieldData>> fetchAgentsByIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+
+    const int batchSize = 10; // Firestore whereIn limit
+    final List<AgentFieldData> agents = [];
+
+    for (var i = 0; i < ids.length; i += batchSize) {
+      final end = (i + batchSize < ids.length) ? i + batchSize : ids.length;
+      final chunk = ids.sublist(i, end);
+
+      final snapshot = await _db
+          .collection('users')
+          .where(FieldPath.documentId, whereIn: chunk)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        try {
+          final setupDoc = await _db
+              .collection('users')
+              .doc(doc.id)
+              .collection('agentProfile')
+              .doc('profile')
+              .get();
+
+          agents.add(AgentFieldData.fromFirestore(
+            doc.data() ?? {},
+            setupDoc.data() ?? {},
+          ));
+        } catch (e) {
+          print("Error building AgentFieldData for ${doc.id}: $e");
+        }
+      }
+    }
+
+    return agents;
+  }
 
 
 

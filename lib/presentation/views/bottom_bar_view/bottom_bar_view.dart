@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
+import 'package:propmeet/presentation/views/user_side_views/chat_view/chta_list_screen.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
@@ -25,7 +26,8 @@ class _BottomBarViewState extends State<BottomBarView> {
     HomeView(),
     TopAgentView(),
     FavouritesView(),
-    ChatView(),
+    // ChatView(),
+    ChatListScreen(),
     UserProfileView(),
   ];
 
@@ -52,9 +54,15 @@ class _BottomBarViewState extends State<BottomBarView> {
             height: Responsive.height(10),
             decoration: BoxDecoration(
               color: AppColors.white,
+              border: const Border(
+                top: BorderSide(
+                  color: AppColors.goldenBackgroundColor,
+                  width: 5,
+                ),
+              ),
             ),
             child: Obx(
-              () => Column(
+                  () => Column(
                 children: [
                   SizedBox(height: Responsive.height(1)),
                   Row(
@@ -89,6 +97,7 @@ class _BottomBarViewState extends State<BottomBarView> {
               ),
             ),
           ),
+
         ),
       ),
     );

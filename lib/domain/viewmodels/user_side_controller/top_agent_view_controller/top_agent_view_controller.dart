@@ -11,13 +11,13 @@ class TopAgentViewController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAgents();
+  fetchAgents();
   }
 
   Future<void> fetchAgents() async {
     try {
       isLoading.value = true;
-      final result = await _repo.fetchAllAgents();
+      final result = await _repo.fetchAllAgentsForTopAgents();
       agents.assignAll(result);
     } catch (e) {
       print("Error fetching agents: $e");

@@ -6,7 +6,6 @@ import '../../../../../shared/config/app_assets/app_assets.dart';
 import '../../../../../shared/constants/app_colors.dart';
 import '../../../../../shared/utils/responsive_utils.dart';
 
-
 class AgentCardWidget extends StatelessWidget {
     final Map<String, dynamic> user;
     final double progress;
@@ -14,7 +13,6 @@ class AgentCardWidget extends StatelessWidget {
     final SwipeAction swipeAction;
     final String swipedCardName;
     final SwipeAction previewAction;
-
     final String previewName;
 
     const AgentCardWidget({
@@ -42,7 +40,6 @@ class AgentCardWidget extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                         /// --- Top Section (Profile Circle + Name + Location) ---
                         Expanded(
                             flex: 4,
@@ -58,42 +55,23 @@ class AgentCardWidget extends StatelessWidget {
                                 child: Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
+                                        // --- Profile Picture ---
                                         Container(
                                             height: 120,
                                             width: 120,
                                             decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                // color: Colors.grey.shade300,
                                                 border: Border.all(
                                                     color: AppColors.goldenBackgroundColor,
                                                     width: 5,
                                                 ),
                                             ),
-                                            child: user["image"] != null &&
-                                                user["image"].toString().isNotEmpty
-                                                ? ClipOval(
-                                                child: Image.network(
-                                                    user["image"],
-                                                    fit: BoxFit.cover,
-                                                ),
-                                            )
-                                                : Center(
-                                                child: Text(
-                                                    (user["name"]?.isNotEmpty ?? false)
-                                                        ? user["name"][0].toUpperCase()
-                                                        : "?",
-                                                    style: TextStyle(
-                                                        fontSize: Responsive.fontSize(15),
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.white,
-                                                    ),
-                                                ),
-                                            ),
+                                            child: _buildProfileImage(),
                                         ),
+
                                         const SizedBox(height: 8),
 
-
-
+                                        // --- Email + Location ---
                                         SizedBox(
                                             height: 50,
                                             child: Card(
@@ -106,7 +84,7 @@ class AgentCardWidget extends StatelessWidget {
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                             Text(
-                                                                user["email"] ?? "-- km",
+                                                                user["email"] ?? "--",
                                                                 style: TextStyle(
                                                                     color: AppColors.white,
                                                                     fontSize: Responsive.fontSize(2.5),
@@ -139,6 +117,7 @@ class AgentCardWidget extends StatelessWidget {
                             ),
                         ),
 
+                        /// --- Bottom Section ---
                         Expanded(
                             flex: 6,
                             child: Padding(
@@ -199,6 +178,31 @@ class AgentCardWidget extends StatelessWidget {
         );
     }
 
+    /// --- Profile Image with fallback logic ---
+    /// --- Profile Initial Circle ---
+    Widget _buildProfileImage() {
+        String email = user["email"]?.toString().trim() ?? "";
+        String initial = email.isNotEmpty ? email[0].toUpperCase() : "?";
+
+        return Container(
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.grey // background color
+            ),
+            alignment: Alignment.center,
+            child: Text(
+                initial,
+                style: TextStyle(
+                    color: AppColors.white, // text color
+                    fontSize: 48, // adjust size as needed
+                    fontWeight: FontWeight.bold,
+                ),
+            ),
+        );
+    }
+
+
+    /// --- Info Row ---
     Widget _infoRow(String? asset, dynamic value, {IconData? icon}) {
         if (asset == null || asset.isEmpty) {
             return Row(
@@ -222,5 +226,4 @@ class AgentCardWidget extends StatelessWidget {
             ],
         );
     }
-
 }

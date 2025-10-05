@@ -22,6 +22,9 @@ class AgentHomeView extends StatelessWidget {
       backgroundColor: AppColors.goldenBackgroundColor,
       appBar: CustomUserAppbar(
         title: 'App Name',
+        notification: () {
+          Get.toNamed(AppRoutes.notificationScreenAgent);
+        },
         trailing: IconButton(
           onPressed: () {
             Get.offAllNamed(AppRoutes.filterPage);
@@ -35,7 +38,7 @@ class AgentHomeView extends StatelessWidget {
             Center(
               child: Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.78,
+               // height: MediaQuery.of(context).size.height * 0.78,
                 decoration: BoxDecoration(color: AppColors.white),
                 child: Center(
                   child: Obx(() {
@@ -51,10 +54,6 @@ class AgentHomeView extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: AppColors.primary,
-                                  border: Border.all(
-                                    color: AppColors.goldenBackgroundColor,
-                                    width: 5,
-                                  ),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -205,7 +204,7 @@ class AgentHomeView extends StatelessWidget {
                     bottom: 30,
                     child: _buildIconButton(
                       Icons.close,
-                      Colors.red,
+                      AppColors.goldenBackgroundColor,
                           () {
                         controller.swiperController.swipe(CardSwiperDirection.left);
                       },

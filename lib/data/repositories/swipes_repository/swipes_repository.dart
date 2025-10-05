@@ -1,91 +1,158 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+enum UserType { agent, user }
+
 class SwipeRepository {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
 
-  Future<void> addFavourite(String targetUserId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+  // 🔹 Unified way to get correct subcollection path
+  String _collectionPath(UserType type) {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) throw Exception("User not logged in");
 
-    await _db.collection("users").doc(uid).collection("favourites").doc(targetUserId).set({
-      "targetUserId": targetUserId,
-      "createdAt": FieldValue.serverTimestamp(),
-    });
-
-    // Increment swipe count
-    await _db.collection("users").doc(uid).set({
-      "swipeCount": FieldValue.increment(1),
-      "likeCount": FieldValue.increment(1),
-    }, SetOptions(merge: true));
+    return type == UserType.agent
+        ? 'users/$userId/agentProfile/profile'
+        : 'users/$userId/profile_user/setupData';
   }
 
-  /// Add to dislikes
-  Future<void> addDislike(String targetUserId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+  /// ✅ Called on swipe action
+  Future<void> recordSwipe({
+    required String targetId,
+    required bool liked,
+    required UserType currentUserType,
+    required UserType targetType,
+  }) async {
+    final currentUserId = _auth.currentUser?.uid;
+    if (currentUserId == null) return;
 
-    await _db.collection("users").doc(uid).collection("dislikes").doc(targetUserId).set({
-      "targetUserId": targetUserId,
-      "createdAt": FieldValue.serverTimestamp(),
-    });
-
-    await _db.collection("users").doc(uid).set({
-      "swipeCount": FieldValue.increment(1),
-      "dislikeCount": FieldValue.increment(1),
-    }, SetOptions(merge: true));
-  }
-
-  /// Get favourites
-  Future<List<String>> fetchFavourites() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return [];
-
-    final snapshot = await _db.collection("users").doc(uid).collection("favourites").get();
-    return snapshot.docs.map((doc) => doc.id).toList();
-  }
-
-  /// Get dislikes
-  Future<List<String>> fetchDislikes() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return [];
-
-    final snapshot = await _db.collection("users").doc(uid).collection("dislikes").get();
-    return snapshot.docs.map((doc) => doc.id).toList();
-  }
-
-  Future<void> addFavouriteAndCheckMatch(String targetUserId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    // Step 1: Add current user’s like
-    await addFavourite(targetUserId);
-
-    // Step 2: Check if target user also liked me
-    final targetFavourite = await _db
-        .collection("users")
-        .doc(targetUserId)
-        .collection("favourites")
-        .doc(uid)
-        .get();
-
-    if (targetFavourite.exists) {
-      // 🎉 It's a match!
-      await _createChatRoom(uid, targetUserId);
-      // TODO: send FCM notification
+    if (liked) {
+      await _handleLike(
+        likerId: currentUserId,
+        likedId: targetId,
+        likerIsUser: currentUserType == UserType.user,
+      );
+    } else {
+      await _handleDislike(
+        dislikerId: currentUserId,
+        dislikedId: targetId,
+        dislikerIsUser: currentUserType == UserType.user,
+      );
     }
   }
 
-  Future<void> _createChatRoom(String userA, String userB) async {
-    final chatId = userA.hashCode <= userB.hashCode
-        ? "${userA}_$userB"
-        : "${userB}_$userA";
+  /// ❤️ When user swipes right (like)
+  Future<void> _handleLike({
+    required String likerId,
+    required String likedId,
+    required bool likerIsUser,
+  }) async {
+    final likerCollection =
+    likerIsUser ? 'users/$likerId/profile_user/setupData' : 'users/$likerId/agentProfile/profile';
+    final likedCollection =
+    likerIsUser ? 'users/$likedId/agentProfile/profile' : 'users/$likedId/profile_user/setupData';
 
-    await _db.collection("chats").doc(chatId).set({
-      "members": [userA, userB],
-      "createdAt": FieldValue.serverTimestamp(),
+    final likerRef = _db.doc(likerCollection);
+    final likedRef = _db.doc(likedCollection);
+
+    // Add liked user to liker’s liked list
+    await likerRef.set({
+      'swipes': {
+        'liked': FieldValue.arrayUnion([likedId])
+      }
+    }, SetOptions(merge: true));
+
+    // Check if target already liked back
+    final likedSnap = await likedRef.get();
+    final likedData = likedSnap.data();
+    final theirLikes = (likedData?['swipes']?['liked'] as List?) ?? [];
+
+    if (theirLikes.contains(likerId)) {
+      // 🎯 Mutual match
+      await _saveMatch(likerRef, likedRef, likerId, likedId);
+    } else {
+      // 💌 Notify target about "like"
+      await _createNotification(
+        receiverRef: likedRef,
+        senderId: likerId,
+        type: 'liked',
+        senderIsUser: likerIsUser,
+      );
+    }
+  }
+
+  /// 💔 When user swipes left (dislike)
+  Future<void> _handleDislike({
+    required String dislikerId,
+    required String dislikedId,
+    required bool dislikerIsUser,
+  }) async {
+    final dislikerCollection =
+    dislikerIsUser ? 'users/$dislikerId/profile_user/setupData' : 'users/$dislikerId/agentProfile/profile';
+    final dislikerRef = _db.doc(dislikerCollection);
+
+    await dislikerRef.set({
+      'swipes': {
+        'disliked': FieldValue.arrayUnion([dislikedId])
+      }
     }, SetOptions(merge: true));
   }
 
+  /// 🎯 Save mutual match
+  Future<void> _saveMatch(
+      DocumentReference likerRef,
+      DocumentReference likedRef,
+      String likerId,
+      String likedId,
+      ) async {
+    await likerRef.set({
+      'swipes': {
+        'matched': FieldValue.arrayUnion([likedId])
+      }
+    }, SetOptions(merge: true));
+
+    await likedRef.set({
+      'swipes': {
+        'matched': FieldValue.arrayUnion([likerId])
+      }
+    }, SetOptions(merge: true));
+
+    // 🔔 Notify both users
+    await _createNotification(
+        receiverRef: likedRef, senderId: likerId, type: 'match');
+    await _createNotification(
+        receiverRef: likerRef, senderId: likedId, type: 'match');
+  }
+
+  /// 🔔 Create Firestore notification document
+  Future<void> _createNotification({
+    required DocumentReference receiverRef,
+    required String senderId,
+    required String type,
+    bool? senderIsUser,
+  }) async {
+    final senderCollection = senderIsUser == null
+        ? 'profile_user'
+        : (senderIsUser ? 'users/$senderId/profile_user/setupData' : 'users/$senderId/agentProfile/profile');
+
+    final senderDoc = await _db.doc(senderCollection).get();
+    final senderData = senderDoc.data() ?? {};
+    final senderName = senderData['firstName'] ??
+        senderData['name'] ??
+        senderData['email'] ??
+        'Someone';
+
+    await receiverRef.collection('notifications').add({
+      'type': type, // liked / match
+      'fromId': senderId,
+      'fromName': senderName,
+      'read': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    // 🚀 (Later — FCM push)
+    // final receiverToken = (await receiverRef.get()).data()?['fcmToken'];
+    // if (receiverToken != null) sendPush(receiverToken, type, senderName);
+  }
 }

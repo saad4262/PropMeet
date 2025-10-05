@@ -32,7 +32,7 @@ class AgentProfileView extends StatelessWidget {
         child: Center(
           child: Container(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.78,
+           // height: MediaQuery.of(context).size.height * 0.78,
             color: AppColors.grey.shade300,
             child: Column(
               children: [

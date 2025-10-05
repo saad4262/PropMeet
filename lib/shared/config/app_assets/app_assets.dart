@@ -26,6 +26,9 @@ class AppAssets{
   static const String homeOnSaleIcon="$imagesPath/home_on_sale_icon.svg";
   static const String landSizeIcon="$imagesPath/land_size_icon.svg";
 
+  static const String audioCallIcon="$imagesPath/audio_call_icon.svg";
+  static const String videoCallIcon="$imagesPath/video_call_icon.svg";
+
 
 
 

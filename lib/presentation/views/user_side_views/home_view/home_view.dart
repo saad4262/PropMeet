@@ -22,6 +22,9 @@ class HomeView extends StatelessWidget {
       backgroundColor: AppColors.goldenBackgroundColor,
       appBar: CustomUserAppbar(
         title: 'App Name',
+        notification: () {
+          Get.toNamed(AppRoutes.notificationScreenUser);
+        },
         trailing: IconButton(
           onPressed: () {
             Get.offAllNamed(AppRoutes.filterPage);
@@ -29,16 +32,17 @@ class HomeView extends StatelessWidget {
           icon: Icon(Icons.menu, color: AppColors.primary),
         ),
       ),
+
       body: SafeArea(
         child: Stack(
           children: [
             Center(
               child: Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.78,
+              //  height: MediaQuery.of(context).size.height * 0.78,
                 decoration: BoxDecoration(
                   color: AppColors.white,
-                  borderRadius: BorderRadius.circular(20),
+              //    borderRadius: BorderRadius.circular(20),
                 ),
                 child: Obx(() {
                   if (controller.isLoading.value) {
@@ -53,10 +57,6 @@ class HomeView extends StatelessWidget {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: AppColors.primary,
-                                border: Border.all(
-                                  color: AppColors.goldenBackgroundColor,
-                                  width: 5,
-                                ),
                               ),
                               child: Center(
                                 child: Text(
@@ -143,44 +143,48 @@ class HomeView extends StatelessWidget {
 
               return Stack(
                 children: [
+                  if (controller.showRefresh.value)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: controller.shuffleUsers,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          elevation: 6,
+                        ),
+                        child: Text("Shuffle again", style: TextStyle(fontSize: Responsive.fontSize(4))),
+                      ),
+                    ),
+
                   Positioned(
                     left: 50,
                     bottom: 10,
                     child: _buildIconButton(
                       Icons.close,
                       AppColors.goldenBackgroundColor,
-                      () {
+                          () {
                         controller.swiperController.swipe(
                           CardSwiperDirection.left,
                         );
                       },
                     ),
                   ),
-                  // Positioned(
-                  //   left: 0,
-                  //   right: 0,
-                  //   bottom: 35,
-                  //   child:
-                  //   _buildIconButton(Icons.favorite, AppColors.primary, () {
-                  //     final currentCard = controller.currentCards[controller.currentIndex.value];
-                  //     controller.favouriteController.addToFavourites(currentCard);
-                  //     controller.showSnackBar(currentCard['name']!, action: "favourite");
-                  //     controller.swiperController.swipe(CardSwiperDirection.right);
-                  //   }),
-                  //
-                  // ),
+
                   Positioned(
                     right: 50,
                     bottom: 10,
                     child: _buildIconButton(
                       Icons.check,
                       AppColors.primary,
-                      () {},
+                          () {
+                        controller.swiperController.swipe(CardSwiperDirection.right);
+                      },
                     ),
                   ),
                 ],
               );
             }),
+
           ],
         ),
       ),
@@ -192,13 +196,13 @@ class HomeView extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(40),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: AppColors.black,
           border: Border.all(color: color, width: 2),
         ),
-        child: Icon(icon, size: 30, color: color),
+        child: Icon(icon, size: 20, color: color, fill: 1.0),
       ),
     );
   }

@@ -3,7 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primary = Color(0xFF0066FF);
+  //static const primary = Color(0xFF0066FF);
+  static const primary = Color(0xff1B27A1);
   static const secondary = Color(0xFF00CC99);
   static const lightBlue = Color(0xff6BB0FF);
   static const white = Colors.white;

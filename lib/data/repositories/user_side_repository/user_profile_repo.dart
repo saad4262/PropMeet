@@ -152,46 +152,6 @@ class UserProfileRepository {
     return agents;
   }
 
-
-  // Future<List<UserModel>> fetchFavouriteAgents() async {
-  //   final uid = _auth.currentUser?.uid;
-  //   if (uid == null) return [];
-  //
-  //   try {
-  //     // 1️⃣ Fetch current user document
-  //     final userDoc = await _db.collection("users").doc(uid).get();
-  //     final rootData = userDoc.data() ?? {};
-  //
-  //     // 2️⃣ Extract favourites list
-  //     List<dynamic> favs = rootData['swipes']?['favourites'] ?? [];
-  //     if (favs.isEmpty) return [];
-  //
-  //     // 3️⃣ Fetch all favourite agents
-  //     List<UserModel> agents = [];
-  //     for (String favId in favs) {
-  //       final favDoc = await _db.collection("users").doc(favId).get();
-  //
-  //       if (favDoc.exists) {
-  //         final setupDoc = await _db
-  //             .collection("users")
-  //             .doc(favId)
-  //             .collection("profile_user")
-  //             .doc("setupData")
-  //             .get();
-  //         print("User raw data: $rootData");
-  //
-  //         final setupData = setupDoc.data() ?? {};
-  //         agents.add(UserModel.fromFirestore(favDoc, setupData));
-  //       }
-  //     }
-  //
-  //     return agents;
-  //   } catch (e) {
-  //     print("Error fetching favourites: $e");
-  //     return [];
-  //   }
-  // }
-
   Future<void> recordSwipe({
     required String agentUserId,
     required String currentUserId,

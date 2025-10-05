@@ -65,11 +65,8 @@ class AgentFieldData {
   });
 
 
-
-  factory AgentFieldData.fromFirestore(
-      Map<String, dynamic> rootData,
-      Map<String, dynamic> map,
-      ) {
+  factory AgentFieldData.fromFirestore(Map<String, dynamic> rootData,
+      Map<String, dynamic> map,) {
     final setupData = map['fieldData'] ?? {};
     final selections1 = map['selectionsOption1'] ?? {};
     final selections2 = map['selectionsOption2'] ?? {};
@@ -101,22 +98,32 @@ class AgentFieldData {
       phoneNumber: setupData['Phone Number']?.toString() ?? '',
       professionalTitle: setupData['Professional Title']?.toString() ?? '',
       yearsOfExperience: setupData['Years of Experience']?.toString() ?? '',
-      medianDaysOnMarket: setupData['What was your median days on market (time advertised before sale)?']?.toString() ?? '',
+      medianDaysOnMarket: setupData['What was your median days on market (time advertised before sale)?']
+          ?.toString() ?? '',
       ruralAcreage: setupData['Rural / Acreage']?.toString() ?? '',
       townhouse: setupData['Townhouse']?.toString() ?? '',
       house: setupData['House']?.toString() ?? '',
       land: setupData['Land']?.toString() ?? '',
       luxuryHomes: setupData['Luxury Homes']?.toString() ?? '',
       offThePlan: setupData['Off-the-Plan']?.toString() ?? '',
-      managedProperties: setupData['How many properties do you currently manage under rental agreements?']?.toString() ?? '',
-      soldProperties: setupData['How many properties have you sold in the last 12 months?']?.toString() ?? '',
+      managedProperties: setupData['How many properties do you currently manage under rental agreements?']
+          ?.toString() ?? '',
+      soldProperties: setupData['How many properties have you sold in the last 12 months?']
+          ?.toString() ?? '',
 
       // ✅ Apply fix here
-      profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString()),
+      //profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString()),
+      profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString())
+          .isNotEmpty
+          ? _fixFirebaseImageUrl(setupData['profileImage']?.toString())
+          : "assets/images/user4.png",
+
 
       feeStructure: selections1['Fee Structure']?.toString() ?? '',
-      feesNegotiable: selections2['Are your fees negotiable?']?.toString() ?? '',
-      serviceProvided: setSelection['What service do you provide to property owners?']?.toString() ?? '',
+      feesNegotiable: selections2['Are your fees negotiable?']?.toString() ??
+          '',
+      serviceProvided: setSelection['What service do you provide to property owners?']
+          ?.toString() ?? '',
       toggleLeaseRenewal: rootData['toggleLeaseRenewal'] ?? false,
       toggleNegotiable: rootData['toggleNegotiable'] ?? false,
 
@@ -171,5 +178,50 @@ class AgentFieldData {
         "disliked": disliked,
       }
     };
+  }
+
+  AgentFieldData copyWith({
+    String? firstName,
+    String? lastName,
+    String? title,
+    String? bio,
+    String? experience,
+    String? rating,
+    String? reviewCount,
+    String? medianDays,
+    String? managing,
+    String? serviceProvided,
+    String? feeStructure,
+  }) {
+    return AgentFieldData(
+      apartmentAndUnit: apartmentAndUnit,
+      createdAt: createdAt,
+      averageRating: rating ?? averageRating,
+      bio: bio ?? this.bio,
+      clientReviews: reviewCount ?? clientReviews,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phoneNumber: phoneNumber,
+      professionalTitle: title ?? professionalTitle,
+      yearsOfExperience: experience ?? yearsOfExperience,
+      medianDaysOnMarket: medianDays ?? medianDaysOnMarket,
+      ruralAcreage: ruralAcreage,
+      townhouse: townhouse,
+      house: house,
+      land: land,
+      luxuryHomes: luxuryHomes,
+      offThePlan: offThePlan,
+      managedProperties: managing ?? managedProperties,
+      soldProperties: soldProperties,
+      profileImage: profileImage,
+      feeStructure: feeStructure ?? this.feeStructure,
+      feesNegotiable: feesNegotiable,
+      serviceProvided: serviceProvided ?? this.serviceProvided,
+      toggleLeaseRenewal: toggleLeaseRenewal,
+      toggleNegotiable: toggleNegotiable,
+      swipeCount: swipeCount,
+      liked: liked,
+      disliked: disliked,
+    );
   }
 }

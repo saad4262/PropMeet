@@ -196,6 +196,7 @@ import 'package:get/get.dart';
 import 'package:propmeet/model/agent_model/agent_model.dart';
 import 'package:propmeet/shared/config/app_assets/app_assets.dart';
 import '../../../../data/repositories/agent_side_repository/agent_profile_repo.dart';
+import '../../../../data/repositories/swipes_repository/swipes_repository.dart';
 import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
 import '../../../../presentation/views/user_side_views/home_view/home_custom_widgets/card_items.dart';
 import '../favourites_view_controller/favourite_view_controller.dart';
@@ -241,38 +242,37 @@ class HomeController extends GetxController {
     startProgressTimer();
   }
 
+  // file: domain/viewmodels/user_side_controller/home_controller/home_controller.dart
   Future<void> _loadAgents() async {
     try {
       isLoading.value = true;
 
-      final agents = await _agentRepo.fetchAllAgents();
-      allAgentObjects.clear();
-      allAgentObjects.addAll(agents);
+      // NOTE: fetchAllAgents now returns List<Map<String,dynamic>> where each item has id and agent
+      final agentEntries = await _agentRepo.fetchAllAgents();
 
-      // map AgentFieldData -> map for cards (name, image, distance)
-      // distance can be placeholder for now or derived from profile if available.
-      final cards = agents.map((a) {
+      allAgentObjects.clear();
+      // Build card list with id, so we can send writes back
+      final cards = agentEntries.map((entry) {
+        final id = entry['id'] as String;
+        final a = entry['agent'] as AgentFieldData;
+        allAgentObjects.add(a);
         final displayName = "${a.firstName.isNotEmpty ? a.firstName : ''}"
             "${a.lastName.isNotEmpty ? ' ${a.lastName}' : ''}"
             .trim();
-        // fallback image if none:
         final image = (a.profileImage.isNotEmpty) ? a.profileImage : AppAssets.user1;
-        // derive a distance string — if you have geolocation later, replace this:
         final distance = (a.medianDaysOnMarket.isNotEmpty) ? "${a.medianDaysOnMarket} " : "5 km";
 
         return {
+          'id': id,
           'name': displayName.isNotEmpty ? displayName : (a.phoneNumber.isNotEmpty ? a.phoneNumber : 'Agent'),
           'image': image,
           'distance': distance,
         };
       }).toList();
 
-      // shuffle to emulate swipe deck behavior
       cards.shuffle();
-
       currentCards.value = List<Map<String, String>>.from(cards);
 
-      // small delay to mimic current behavior of your loader being shown
       Future.delayed(const Duration(milliseconds: 200), () {
         isLoading.value = false;
       });
@@ -288,6 +288,7 @@ class HomeController extends GetxController {
       );
     }
   }
+
 
   void shuffleUsers() {
     currentCards.shuffle();
@@ -364,6 +365,7 @@ class HomeController extends GetxController {
   //   return true;
   // }
 
+
   @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer?.cancel();
@@ -376,55 +378,89 @@ class HomeController extends GetxController {
     this.currentIndex.value = currentIndex ?? previousIndex;
     swipedCardName.value = swipedUser['name'] ?? '';
 
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final agentId = swipedUser['id'] ?? '';
+    if (agentId.isEmpty) {
+      print('Skipping swipe — missing agentId for user: ${swipedUser['name']}');
+      return true;
+    }
+
+    final SwipeRepository swipeRepo = SwipeRepository();
 
     if (direction == CardSwiperDirection.right) {
       likedNames.add(swipedUser['name'] ?? '');
       swipeAction.value = SwipeAction.like;
 
-      // keep your favourites logic if you want
-      // favouriteController.addToFavourites(swipedUser);
-
-      if (currentUserId.isNotEmpty && agentId.isNotEmpty) {
-        userRepo.recordSwipe(
-          agentUserId: agentId,
-          currentUserId: currentUserId,
-          liked: true,
-        ).catchError((e) => print('recordSwipe error: $e'));
-      } else {
-        print('Skipping recordSwipe — missing ids agent:$agentId current:$currentUserId');
-      }
+      // Record swipe using new repository
+      swipeRepo.recordSwipe(
+        targetId: agentId,
+        liked: true,
+        currentUserType: UserType.user, // CURRENT user is a regular user
+        targetType: UserType.agent,    // TARGET is an agent
+      ).catchError((e) => print('recordSwipe like error: $e'));
 
       showSnackBar(swipedUser['name'] ?? '', action: "like");
+
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
 
-      if (currentUserId.isNotEmpty && agentId.isNotEmpty) {
-        userRepo.recordSwipe(
-          agentUserId: agentId,
-          currentUserId: currentUserId,
-          liked: false,
-        ).catchError((e) => print('recordSwipe error: $e'));
-      }
+      swipeRepo.recordSwipe(
+        targetId: agentId,
+        liked: false,
+        currentUserType: UserType.user,
+        targetType: UserType.agent,
+      ).catchError((e) => print('recordSwipe dislike error: $e'));
 
       showSnackBar(swipedUser['name'] ?? '', action: "dislike");
-    }
-
-    Future.delayed(const Duration(milliseconds: 400), () {
-      swipeAction.value = SwipeAction.none;
-      swipedCardName.value = '';
-    });
-
-    if (this.currentIndex.value >= currentCards.length) {
-      showRefresh.value = true;
-      return true;
     }
 
     startProgressTimer();
     return true;
   }
 
+  // @override
+  // bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
+  //   _progressTimer?.cancel();
+  //
+  //   if (previousIndex < 0 || previousIndex >= currentCards.length) {
+  //     return true;
+  //   }
+  //
+  //   final swipedUser = currentCards[previousIndex];
+  //   this.currentIndex.value = currentIndex ?? previousIndex;
+  //   swipedCardName.value = swipedUser['name'] ?? '';
+  //
+  //   final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+  //   final agentId = swipedUser['id'] ?? '';
+  //
+  //   if (direction == CardSwiperDirection.right) {
+  //     likedNames.add(swipedUser['name'] ?? '');
+  //     swipeAction.value = SwipeAction.like;
+  //
+  //     if (currentUserId.isNotEmpty && agentId.isNotEmpty) {
+  //       // call the new unified method that also notifies/checks match
+  //       final SwipeRepository swipeRepo = SwipeRepository();
+  //       swipeRepo.likeWithNotificationAndMatch(agentId).catchError((e) => print('likeWithNotification error: $e'));
+  //     } else {
+  //       print('Skipping recordSwipe — missing ids agent:$agentId current:$currentUserId');
+  //     }
+  //
+  //     showSnackBar(swipedUser['name'] ?? '', action: "like");
+  //   } else if (direction == CardSwiperDirection.left) {
+  //     swipeAction.value = SwipeAction.dislike;
+  //     // you already had recordSwipe for dislikes, keep it or add similar atomic op
+  //     if (currentUserId.isNotEmpty && agentId.isNotEmpty) {
+  //       userRepo.recordSwipe(
+  //         agentUserId: agentId,
+  //         currentUserId: currentUserId,
+  //         liked: false,
+  //       ).catchError((e) => print('recordSwipe error: $e'));
+  //     }
+  //     showSnackBar(swipedUser['name'] ?? '', action: "dislike");
+  //   }
+  //   startProgressTimer();
+  //   return true;
+  // }
+  //
 
 
   void updateSwipePreview(double percentX, String cardName) {

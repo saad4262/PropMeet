@@ -7,6 +7,7 @@ import 'package:propmeet/core/bindings/onBarding_binding.dart';
 import 'package:propmeet/core/bindings/splash_bindings.dart';
 import 'package:propmeet/core/bindings/user_profile_binding.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
+import 'package:propmeet/data/repositories/swipes_repository/swipes_repository.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_all_users_controller/top_user_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_bottom_bar_controller.dart';
 import 'package:propmeet/domain/viewmodels/agent_side_controller/agent_chat_view_controller/agent_chat_view_controller.dart';
@@ -34,6 +35,7 @@ import 'package:propmeet/presentation/views/user_profile/user_profile1.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/home_view/filter_page.dart';
+import 'package:propmeet/presentation/views/user_side_views/home_view/notification_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
 
@@ -161,6 +163,7 @@ class AppPages {
         Get.lazyPut<AgentProfileViewController>(
           () => AgentProfileViewController(),
         );
+
         Get.lazyPut<AgentChatViewController>(() => AgentChatViewController());
       }),
     ),
@@ -183,6 +186,14 @@ class AppPages {
           () => AgentEditProfileViewController(),
         );
       }),
+    ),
+    GetPage(
+      name: AppRoutes.notificationScreenUser,
+      page: () => NotificationsView(userType: UserType.user),
+    ),
+    GetPage(
+      name: AppRoutes.notificationScreenAgent,
+      page: () => NotificationsView(userType: UserType.agent),
     ),
   ];
 }
