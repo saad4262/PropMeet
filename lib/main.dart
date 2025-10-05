@@ -13,6 +13,8 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+
+
   // Force portrait only
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -25,7 +27,7 @@ void main() async {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark, // dark icons (for light bg)
       statusBarBrightness: Brightness.light, // iOS ke liye
-    ),
+  ),
   );
 
   runApp(const MyApp());
@@ -43,7 +45,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      initialRoute: AppRoutes.chatListScreen,
+      initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:propmeet/presentation/views/chat_view/chatlist_screen.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
@@ -25,7 +26,7 @@ class _BottomBarViewState extends State<BottomBarView> {
     HomeView(),
     TopAgentView(),
     FavouritesView(),
-    ChatView(),
+    ChatListScreen(),
     UserProfileView(),
   ];
 

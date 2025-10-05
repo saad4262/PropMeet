@@ -9,6 +9,7 @@ import 'package:propmeet/presentation/views/agent_side_views/agent_favourite_vie
 import 'package:propmeet/presentation/views/agent_side_views/agent_home_view/agent_home_view.dart';
 import 'package:propmeet/presentation/views/agent_side_views/agent_profile_view/agent_profile_view.dart';
 import 'package:propmeet/presentation/views/agent_side_views/top_users_view/top_users_view.dart';
+import 'package:propmeet/presentation/views/chat_view/chatlist_screen.dart';
 import '../../../domain/viewmodels/bottom_bar_controller/bottom_bar_controller.dart';
 import '../../../shared/config/app_assets/app_assets.dart';
 import '../../../shared/constants/app_colors.dart';
@@ -27,7 +28,7 @@ class _AgentBottomBarViewState extends State<AgentBottomBarView> {
     AgentHomeView(),
     TopUsersView(),
     AgentFavouriteView(),
-    AgentChatView(),
+    ChatListScreen(),
     AgentProfileView(),
 
   ];

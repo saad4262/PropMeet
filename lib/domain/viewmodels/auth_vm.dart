@@ -24,15 +24,13 @@ class AuthController extends GetxController {
   var verificationId = "".obs;
   var isOtpSent = false.obs;
 
-
   void toggleTag() {
-  if (selectedTag.value == "user") {
-    selectedTag.value = "agent";
-  } else {
-    selectedTag.value = "user";
+    if (selectedTag.value == "user") {
+      selectedTag.value = "agent";
+    } else {
+      selectedTag.value = "user";
+    }
   }
-}
-
 
   Future<void> sendOtp(String phoneNumber) async {
     phoneNumber = phoneNumber.trim();
@@ -145,7 +143,7 @@ class AuthController extends GetxController {
       final user = await _repo.signUp(
         email,
         password,
-        tag: selectedTag.value, 
+        tag: selectedTag.value,
         // name,
         // avatarFile: avatarFile.value,
       );
@@ -255,18 +253,22 @@ class AuthController extends GetxController {
     try {
       final user = await _repo.login(email, password);
       if (user == null) {
-        Get.snackbar("Error", "User ID not found",
-            backgroundColor: AppColors.errorColor);
+        Get.snackbar(
+          "Error",
+          "User ID not found",
+          backgroundColor: AppColors.errorColor,
+        );
         return false;
       }
 
       currentUser.value = user;
 
       // Fetch role/tag from Firestore safely
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.userId!) // safe with !
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.userId!) // safe with !
+              .get();
 
       if (snapshot.exists) {
         final role = snapshot['tag'] ?? 'user'; // default to user
@@ -288,40 +290,79 @@ class AuthController extends GetxController {
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        Get.snackbar("Error", "No user found with this email",
-            backgroundColor: AppColors.errorColor);
+        Get.snackbar(
+          "Error",
+          "No user found with this email",
+          backgroundColor: AppColors.errorColor,
+        );
       } else if (e.code == 'wrong-password') {
-        Get.snackbar("Error", "Incorrect password",
-            backgroundColor: AppColors.errorColor);
+        Get.snackbar(
+          "Error",
+          "Incorrect password",
+          backgroundColor: AppColors.errorColor,
+        );
       } else {
-        Get.snackbar("Error", e.message ?? "An error occurred",
-            backgroundColor: AppColors.errorColor);
+        Get.snackbar(
+          "Error",
+          e.message ?? "An error occurred",
+          backgroundColor: AppColors.errorColor,
+        );
       }
       return false;
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong",
-          backgroundColor: AppColors.errorColor);
+      Get.snackbar(
+        "Error",
+        "Something went wrong",
+        backgroundColor: AppColors.errorColor,
+      );
       return false;
     } finally {
       isLoading.value = false;
     }
   }
 
-
   void setAvatar(File? file) {
     avatarFile.value = file;
   }
 
   Future<void> logout() async {
-    await _repo.logout();
-    Get.snackbar(
-      "Logged Out",
-      "You have successfully logged out.",
-      backgroundColor: AppColors.successColor,
-    );
+    try {
+      // ✅ Firebase session clear karo
+      await FirebaseAuth.instance.signOut();
 
-    Get.offAllNamed(AppRoutes.login);
+      // ✅ Current user reset
+      currentUser.value = null;
+
+      // ✅ Optional: GetX repo logout agar aur data clear karta ho
+      await _repo.logout();
+
+      Get.snackbar(
+        "Logged Out",
+        "You have successfully logged out.",
+        backgroundColor: AppColors.successColor,
+      );
+
+      // ✅ Navigation clean and redirect
+      Get.offAllNamed(AppRoutes.login);
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Logout failed: $e",
+        backgroundColor: AppColors.errorColor,
+      );
+    }
   }
+
+  // Future<void> logout() async {
+  //   await _repo.logout();
+  //   Get.snackbar(
+  //     "Logged Out",
+  //     "You have successfully logged out.",
+  //     backgroundColor: AppColors.successColor,
+  //   );
+
+  //   Get.offAllNamed(AppRoutes.login);
+  // }
 
   void resetPassword(String email) async {
     isLoading.value = true;
