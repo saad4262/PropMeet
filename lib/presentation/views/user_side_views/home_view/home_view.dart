@@ -175,7 +175,7 @@ class HomeView extends StatelessWidget {
                     bottom: 10,
                     child: _buildIconButton(
                       Icons.check,
-                      AppColors.primary,
+                      Colors.blue,
                           () {
                         controller.swiperController.swipe(CardSwiperDirection.right);
                       },

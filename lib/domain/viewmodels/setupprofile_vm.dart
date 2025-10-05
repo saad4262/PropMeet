@@ -35,7 +35,7 @@ class ProfileSetup extends GetxController {
       "tags": ["Sell", "Rent"],
       "question": "What are you looking to do?",
       "subQuestion":
-      "Let us know your property goals so we can match you with the best agents",
+          "Let us know your property goals so we can match you with the best agents",
       "options": ["Sell My Home", "Rent My Property"],
       "subOptions": [
         "Find agents to help sell your property",
@@ -46,7 +46,7 @@ class ProfileSetup extends GetxController {
     {
       "question": "What type of property is it ?",
       "subQuestion":
-      "This helps us match you with agents who specialise in your property type.",
+          "This helps us match you with agents who specialise in your property type.",
       "options": ["Home", "Apartment", "Townhouse", "Land"],
       "subOptions": [
         "Detached or semi-detached home",
@@ -64,12 +64,12 @@ class ProfileSetup extends GetxController {
     {
       "question": "Where’s your property located?",
       "subQuestion":
-      "We will find the best local agents in your area, Then you can swipe to find the right one for you.",
+          "We will find the best local agents in your area, Then you can swipe to find the right one for you.",
     },
     {
       "question": "What’s your timeline?",
       "subQuestion":
-      "This helps us prioritise the most suitable agents and set the right expectations.",
+          "This helps us prioritise the most suitable agents and set the right expectations.",
       "options": [
         "Just Researching",
         "Selling in 3-6 Months",
@@ -85,7 +85,7 @@ class ProfileSetup extends GetxController {
     {
       "question": "A little more about your property.",
       "subQuestion":
-      "The more details you share, the smarter your agent matches.\nThis helps you connect with the right agents for your property needs. (You can skip this step if you’re not ready. Your profile will still be created.)",
+          "The more details you share, the smarter your agent matches.\nThis helps you connect with the right agents for your property needs. (You can skip this step if you’re not ready. Your profile will still be created.)",
       "fields": [
         {
           "title": "Bedrooms",
@@ -109,7 +109,7 @@ class ProfileSetup extends GetxController {
         },
       ],
       "note":
-      "Owners who shares more details get matched with better suited agents and receive more tailored response",
+          "Owners who shares more details get matched with better suited agents and receive more tailored response",
     },
   ];
 
@@ -141,12 +141,12 @@ class ProfileSetup extends GetxController {
   // }
 
   void setSelection(
-      int page,
-      int? value,
-      double? lat,
-      double? lng,
-      String? address,
-      ) {
+    int page,
+    int? value,
+    double? lat,
+    double? lng,
+    String? address,
+  ) {
     selections[page] = value;
     saveProfileToFirestore(lat, lng, address);
   }
@@ -162,12 +162,12 @@ class ProfileSetup extends GetxController {
   // }
 
   void setPropertyDetail(
-      String field,
-      String value,
-      double? lat,
-      double? lng,
-      String? address,
-      ) {
+    String field,
+    String value,
+    double? lat,
+    double? lng,
+    String? address,
+  ) {
     propertyDetails[field] = value;
     saveProfileToFirestore(lat, lng, address);
   }
@@ -339,10 +339,10 @@ class ProfileSetup extends GetxController {
   }
 
   Future<void> saveProfileToFirestore(
-      double? lat,
-      double? lng,
-      String? address,
-      ) async {
+    double? lat,
+    double? lng,
+    String? address,
+  ) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;

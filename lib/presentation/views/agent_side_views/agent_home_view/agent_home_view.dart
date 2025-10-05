@@ -215,7 +215,7 @@ class AgentHomeView extends StatelessWidget {
                     bottom: 30,
                     child: _buildIconButton(
                       Icons.check,
-                      AppColors.primary,
+                      Colors.blue,
                           () {
                         controller.swiperController.swipe(CardSwiperDirection.right);
                       },

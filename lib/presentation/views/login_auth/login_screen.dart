@@ -4,11 +4,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/auth_vm.dart';
+import 'package:propmeet/domain/viewmodels/google_controller.dart';
 import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
-
-import '../../../shared/config/app_assets/app_assets.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -17,7 +16,7 @@ class LoginView extends StatelessWidget {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final authController = Get.find<AuthController>();
-  // final GoogleAuthController controller = Get.find<GoogleAuthController>();
+  final GoogleAuthController controller = Get.put(GoogleAuthController());
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,7 @@ class LoginView extends StatelessWidget {
                 SizedBox(height: Responsive.height(4)),
 
                 SvgPicture.asset(
-                    AppAssets.homeIcon,
+                  AppImages.logo2,
                   color: AppColors.blueMain,
                   height: Responsive.height(10),
                 ),
@@ -89,12 +88,12 @@ class LoginView extends StatelessWidget {
                     ),
                     validator:
                         (v) =>
-                            !GetUtils.isEmail(v!) ? "Enter valid email" : null,
+                    !GetUtils.isEmail(v!) ? "Enter valid email" : null,
                   ),
                 ),
                 SizedBox(height: Responsive.height(2)),
                 Obx(
-                  () => SizedBox(
+                      () => SizedBox(
                     width: Responsive.width(80),
                     child: TextFormField(
                       controller: _passwordController,
@@ -148,9 +147,9 @@ class LoginView extends StatelessWidget {
                       obscureText: authController.isPasswordHidden.value,
                       validator:
                           (v) =>
-                              v!.length < 6
-                                  ? "Password must be at least 6 chars"
-                                  : null,
+                      v!.length < 6
+                          ? "Password must be at least 6 chars"
+                          : null,
                     ),
                   ),
                 ),
@@ -179,7 +178,7 @@ class LoginView extends StatelessWidget {
                   child: GestureDetector(
                     onTap: authController.toggleRemember,
                     child: Obx(
-                      () => Row(
+                          () => Row(
                         children: [
                           Container(
                             width: Responsive.width(5),
@@ -189,23 +188,23 @@ class LoginView extends StatelessWidget {
                               border: Border.all(
                                 width: 2,
                                 color:
-                                    authController.isRemember.value
-                                        ? AppColors.blueMain
-                                        : AppColors.blueMain,
+                                authController.isRemember.value
+                                    ? AppColors.blueMain
+                                    : AppColors.blueMain,
                               ),
                               color:
-                                  authController.isRemember.value
-                                      ? AppColors.blueMain
-                                      : Colors.transparent,
+                              authController.isRemember.value
+                                  ? AppColors.blueMain
+                                  : Colors.transparent,
                             ),
                             child:
-                                authController.isRemember.value
-                                    ? Icon(
-                                      Icons.check,
-                                      size: Responsive.radius(3),
-                                      color: Colors.white,
-                                    )
-                                    : null,
+                            authController.isRemember.value
+                                ? Icon(
+                              Icons.check,
+                              size: Responsive.radius(3),
+                              color: Colors.white,
+                            )
+                                : null,
                           ),
                           SizedBox(width: Responsive.width(2)),
                           Text(
@@ -220,7 +219,7 @@ class LoginView extends StatelessWidget {
 
                 SizedBox(height: Responsive.height(3)),
                 Obx(
-                  () => SizedBox(
+                      () => SizedBox(
                     width: Responsive.width(80),
                     height: Responsive.height(7),
                     child: Stack(
@@ -237,33 +236,33 @@ class LoginView extends StatelessWidget {
                           height: double.infinity,
                           child: ElevatedButton(
                             onPressed:
-                                authController.isLoading.value
-                                    ? null
-                                    : () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        authController.isLoading.value = true;
+                            authController.isLoading.value
+                                ? null
+                                : () async {
+                              if (_formKey.currentState!.validate()) {
+                                authController.isLoading.value = true;
 
-                                        await Future.delayed(
-                                          const Duration(seconds: 2),
-                                        );
+                                await Future.delayed(
+                                  const Duration(seconds: 2),
+                                );
 
-                                        bool success = await authController
-                                            .login(
-                                              _emailController.text.trim(),
-                                              _passwordController.text.trim(),
-                                            );
+                                bool success = await authController
+                                    .login(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
 
-                                        // await AppNotificationService.saveDeviceToken();
+                                // await AppNotificationService.saveDeviceToken();
 
-                                        authController.isLoading.value = false;
+                                authController.isLoading.value = false;
 
-                                        // if (success) {
-                                        //   Get.offAllNamed(AppRoutes.bottomBarView);
-                                        // } else {
-                                        //   Get.snackbar("Error", "Login failed");
-                                        // }
-                                      }
-                                    },
+                                // if (success) {
+                                //   Get.offAllNamed(AppRoutes.bottomBarView);
+                                // } else {
+                                //   Get.snackbar("Error", "Login failed");
+                                // }
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -274,15 +273,15 @@ class LoginView extends StatelessWidget {
                               ),
                             ),
                             child:
-                                authController.isLoading.value
-                                    ? const SizedBox.shrink() // Text hide loader ke waqt
-                                    : const Text(
-                                      "Login",
-                                      style: TextStyle(
-                                        color: AppColors.white,
-                                        fontFamily: 'Poppins',
-                                      ),
-                                    ),
+                            authController.isLoading.value
+                                ? const SizedBox.shrink() // Text hide loader ke waqt
+                                : const Text(
+                              "Login",
+                              style: TextStyle(
+                                color: AppColors.white,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
                           ),
                         ),
 
@@ -338,7 +337,21 @@ class LoginView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        // authController.isLoading.value = true;
+                        // await controller.signInWithGoogle();
+                        // authController.isLoading.value = false;
+
+                        // if (controller.user.value != null) {
+                        //   // await AppNotificationService.saveDeviceToken();
+                        //   // Get.offAllNamed(AppRoutes.home);
+                        // } else {
+                        //   Get.snackbar("Error", "Google Sign-In failed");
+                        // }
+                        authController.isLoading.value = true;
+                        await controller.signInWithGoogle();
+                        authController.isLoading.value = false;
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.white,
                         shape: RoundedRectangleBorder(
@@ -427,10 +440,10 @@ class LoginView extends StatelessWidget {
                           color: AppColors.blueMain,
                         ),
                         recognizer:
-                            TapGestureRecognizer()
-                              ..onTap = () {
-                                Get.toNamed(AppRoutes.signUp);
-                              },
+                        TapGestureRecognizer()
+                          ..onTap = () {
+                            Get.toNamed(AppRoutes.signUp);
+                          },
                       ),
                     ],
                   ),

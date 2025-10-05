@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:propmeet/presentation/views/chat_view/chatlist_screen.dart';
 import 'package:propmeet/presentation/views/user_side_views/chat_view/chat_view.dart';
-import 'package:propmeet/presentation/views/user_side_views/chat_view/chta_list_screen.dart';
 import 'package:propmeet/presentation/views/user_side_views/favourites_view/favourites_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/top_agents_view/top_agent_view.dart';
 import 'package:propmeet/presentation/views/user_side_views/user_profile_view/user_profile_view.dart';
@@ -26,7 +26,6 @@ class _BottomBarViewState extends State<BottomBarView> {
     HomeView(),
     TopAgentView(),
     FavouritesView(),
-    // ChatView(),
     ChatListScreen(),
     UserProfileView(),
   ];
@@ -143,13 +142,13 @@ class _BottomBarViewState extends State<BottomBarView> {
                       decoration: BoxDecoration(
                         color: badgeColor,
                         shape:
-                            badgeText == null
-                                ? BoxShape.circle
-                                : BoxShape.rectangle,
+                        badgeText == null
+                            ? BoxShape.circle
+                            : BoxShape.rectangle,
                         borderRadius:
-                            badgeText != null
-                                ? BorderRadius.circular(10)
-                                : null,
+                        badgeText != null
+                            ? BorderRadius.circular(10)
+                            : null,
                       ),
                       constraints: const BoxConstraints(
                         minWidth: 14,
@@ -157,16 +156,16 @@ class _BottomBarViewState extends State<BottomBarView> {
                       ),
                       child: Center(
                         child:
-                            badgeText != null
-                                ? Text(
-                                  badgeText,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                                : const SizedBox.shrink(),
+                        badgeText != null
+                            ? Text(
+                          badgeText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                            : const SizedBox.shrink(),
                       ),
                     ),
                   ),

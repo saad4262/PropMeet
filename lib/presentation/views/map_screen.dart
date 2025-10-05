@@ -23,7 +23,7 @@ class MapScreen extends StatelessWidget {
       body: Stack(
         children: [
           Obx(
-                () => Container(
+            () => Container(
               key: ValueKey(
                 controller.selectedLocation.value,
               ), // Forces UI rebuild
@@ -32,9 +32,9 @@ class MapScreen extends StatelessWidget {
                 onMapCreated: controller.setMapController,
                 initialCameraPosition: CameraPosition(
                   target:
-                  controller.selectedLocation.value.latitude != 0.0
-                      ? controller.selectedLocation.value
-                      : const LatLng(24.8607, 67.0011), // Karachi default
+                      controller.selectedLocation.value.latitude != 0.0
+                          ? controller.selectedLocation.value
+                          : const LatLng(24.8607, 67.0011), // Karachi default
                   zoom: 14,
                 ),
 
@@ -43,72 +43,72 @@ class MapScreen extends StatelessWidget {
             ),
           ),
           Obx(
-                () =>
-            controller.searchResults.isNotEmpty
-                ? Padding(
-              padding: const EdgeInsets.only(
-                top: 180.0,
-                left: 15,
-                right: 15,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    15,
-                  ), // Rounded corners
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26, // Soft shadow effect
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    15,
-                  ), // Ensures content respects borders
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10,
-                    ), // Adds spacing inside
-                    itemCount: controller.searchResults.length,
-                    itemBuilder: (context, index) {
-                      final place = controller.searchResults[index];
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(
-                              Icons.location_on,
-                              color: Colors.blueAccent,
+            () =>
+                controller.searchResults.isNotEmpty
+                    ? Padding(
+                      padding: const EdgeInsets.only(
+                        top: 180.0,
+                        left: 15,
+                        right: 15,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26, // Soft shadow effect
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                              offset: Offset(0, 4),
                             ),
-                            title: Text(
-                              place.description,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            onTap: () {
-                              controller.selectPlace(place.placeId);
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Ensures content respects borders
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                            ), // Adds spacing inside
+                            itemCount: controller.searchResults.length,
+                            itemBuilder: (context, index) {
+                              final place = controller.searchResults[index];
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.location_on,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    title: Text(
+                                      place.description,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      controller.selectPlace(place.placeId);
+                                    },
+                                  ),
+                                  if (index !=
+                                      controller.searchResults.length - 1)
+                                    Divider(
+                                      thickness: 1,
+                                      color: Colors.grey[300],
+                                    ), // Separator
+                                ],
+                              );
                             },
                           ),
-                          if (index !=
-                              controller.searchResults.length - 1)
-                            Divider(
-                              thickness: 1,
-                              color: Colors.grey[300],
-                            ), // Separator
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-            )
-                : SizedBox.shrink(),
+                        ),
+                      ),
+                    )
+                    : SizedBox.shrink(),
           ),
           Obx(() {
             final placeDetails = controller.selectedPlaceDetails.value;
@@ -387,9 +387,9 @@ class CustomButton extends StatelessWidget {
     // final mediaQuery = MediaQueryHelper(context);
 
     return Obx(
-          () => SizedBox(
+      () => SizedBox(
         width:
-        isFullWidth ? double.infinity : width ?? 200, // Default width: 200
+            isFullWidth ? double.infinity : width ?? 200, // Default width: 200
         height: height ?? 50, // Default height: 50
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -399,46 +399,46 @@ class CustomButton extends StatelessWidget {
             ),
             padding: EdgeInsets.zero,
             disabledBackgroundColor:
-            color, // ✅ Prevents color from changing to grey when disabled
+                color, // ✅ Prevents color from changing to grey when disabled
           ),
 
           onPressed:
-          isDisabled || buttonController.isLoading.value
-              ? null
-              : () async {
-            buttonController.startLoading();
-            await Future.delayed(Duration(seconds: 2));
-            buttonController.stopLoading();
-            onPressed();
-          },
+              isDisabled || buttonController.isLoading.value
+                  ? null
+                  : () async {
+                    buttonController.startLoading();
+                    await Future.delayed(Duration(seconds: 2));
+                    buttonController.stopLoading();
+                    onPressed();
+                  },
           child:
-          buttonController.isLoading.value
-              ? SizedBox(
-            height: 24,
-            width: 24,
-            child: CircularProgressIndicator(
-              color: textColor,
-              strokeWidth: 3,
-            ),
-          )
-              : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, color: textColor, size: 20),
-                SizedBox(width: Responsive.width(.8)),
-              ],
-              Text(
-                text,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: Responsive.fontSize(4.5),
-                  fontWeight: FontWeight.w600,
-                  fontFamily: "poppins",
-                ),
-              ),
-            ],
-          ),
+              buttonController.isLoading.value
+                  ? SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      color: textColor,
+                      strokeWidth: 3,
+                    ),
+                  )
+                  : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (icon != null) ...[
+                        Icon(icon, color: textColor, size: 20),
+                        SizedBox(width: Responsive.width(.8)),
+                      ],
+                      Text(
+                        text,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: Responsive.fontSize(4.5),
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "poppins",
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );
