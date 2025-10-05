@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/agent_profile_vm.dart';
+import 'package:propmeet/presentation/views/map_screen.dart';
 import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
@@ -113,13 +114,13 @@ class AgentProfile extends StatelessWidget {
                       );
                     } else if (index == 8) {
                       return buildFieldPage7(page);
-                    } else if (index == 9) {
-                      return buildFieldPage8(page);
                     } else {
                       return buildFieldPage(
                         page,
                       ); // 👈 baaki pages pe normal buildFieldPage
                     }
+                  case "location":
+                    return buildFieldPage8(page);
                   case "final":
                     return buildFinalPage(page);
                   default:
@@ -301,7 +302,11 @@ class AgentProfile extends StatelessWidget {
 
                           if (controller.currentPage.value ==
                               controller.pagesData.length - 1) {
-                            controller.saveAgentProfile(); // ✅ Firestore save
+                            controller.saveAgentProfile(
+                              controller.selectedPlaceDetails.value?.lat,
+                              controller.selectedPlaceDetails.value?.lng,
+                              controller.selectedPlaceDetails.value?.address,
+                            ); // ✅ Firestore save
                             Get.offAllNamed(AppRoutes.home);
                           } else {
                             pageController.nextPage(
@@ -2233,94 +2238,184 @@ class AgentProfile extends StatelessWidget {
   }
 
   Widget buildFieldPage8(Map<String, dynamic> page) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Responsive.padding(2.5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Question
-          // Question
-          if (page["question"] != null)
-            Text(
-              page["question"],
-              style: TextStyle(
-                fontSize: Responsive.fontSize(4.5),
-                fontWeight: FontWeight.bold,
-                fontFamily: "poppins",
-                color: AppColors.black,
+          // 🔹 Question
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: Responsive.padding(2.5)),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: [
+                  if (page["question"] != null)
+                    Text(
+                      page["question"],
+                      style: TextStyle(
+                        fontSize: Responsive.fontSize(4.5),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "poppins",
+                        color: AppColors.black,
+                      ),
+                    ),
+                ],
               ),
             ),
-          const SizedBox(height: 10),
+          ),
+          SizedBox(height: Responsive.height(2)),
+          Padding(
+            padding: EdgeInsets.only(
+              left: Responsive.padding(2.5),
+              right: Responsive.padding(9),
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: [
+                  if (page["subQuestion"] != null)
+                    Text(
+                      page["subQuestion"],
+                      style: TextStyle(
+                        fontSize: Responsive.fontSize(3.3),
+                        color: AppColors.black,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
 
-          // SubQuestion
-          if (page["subQuestion"] != null)
-            Text(
-              page["subQuestion"],
-              style: TextStyle(
-                fontSize: Responsive.fontSize(3.2),
-                color: Colors.grey,
-                fontFamily: "poppins",
-              ),
-            ),
-          SizedBox(height: Responsive.height(3)),
+          SizedBox(height: Responsive.height(2)),
 
-          // Heading2 + Field
-          if (page["heading2"] != null) ...[
-            Text(
-              page["heading2"],
-              style: TextStyle(
-                fontSize: Responsive.fontSize(4),
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-                fontFamily: "poppins",
+          Padding(
+            padding: EdgeInsets.only(left: Responsive.padding(2)),
+            child: Container(
+              height: Responsive.height(13),
+              width: Responsive.width(90),
+              decoration: BoxDecoration(
+                color: AppColors.secondaryBlue,
+                border: Border.all(color: AppColors.lightBlue),
+                borderRadius: BorderRadius.circular(15),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                hintText: page["fields"][0]["hint"],
-                hintStyle: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: AppColors.grey,
-                  fontSize: Responsive.fontSize(4),
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: Responsive.screenWidth * 0.08,
-                  vertical: Responsive.screenHeight * 0.02,
-                ),
-                filled: true,
-                fillColor: AppColors.lightgrey,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: AppColors.bordergrey, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: Responsive.height(3)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(width: Responsive.width(2)),
 
-            // 🔹 Use current location button
-            ElevatedButton.icon(
-              onPressed: () {
-                // controller.setLocation("User Current Location (from GPS)");
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(AppImages.shield),
+                  ),
+                  SizedBox(width: Responsive.width(3)),
+                  // ✅ Wrap Column in Expanded
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Your Address is protected",
+                          style: TextStyle(
+                            color: AppColors.blueMain,
+                            fontFamily: "poppins",
+                            fontSize: Responsive.fontSize(4),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Your address stays private until you choose to share it with agent",
+                          style: TextStyle(
+                            color: AppColors.grey,
+                            fontFamily: "poppins",
+                            fontSize: Responsive.fontSize(3.2),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: Responsive.height(2)),
+
+          // 🔹 Search Field
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: GestureDetector(
+              onTap: () async {
+                final result = await Get.to(() => MapScreen()); // open map
+                if (result != null) {
+                  // Update location in controller
+                  if (result != null) {
+                    // result already PlaceDetails hoga
+                    controller.selectedPlaceDetails.value = result;
+                  }
+                }
               },
-              icon: Icon(Icons.my_location, color: AppColors.black),
-              label: Text(
-                "Use Current Location",
-                style: TextStyle(
-                  color: AppColors.black,
-                  fontFamily: "poppins",
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    color: AppColors.black,
+                  ),
+                  const SizedBox(width: 10),
+                  Obx(
+                    () => Text(
+                      controller.selectedPlaceDetails.value?.address ??
+                          "Enter your location",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "poppins",
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+          ),
 
-            const SizedBox(height: 30),
+          const SizedBox(height: 20),
 
-            Container(
+          // 🔹 Use current location button
+          ElevatedButton.icon(
+            onPressed: () {
+              controller.getUserCurrentLocation();
+              if (controller.selectedPlaceDetails.value != null) {
+                final place = controller.selectedPlaceDetails.value!;
+                print("📍 Address: ${place.address}");
+                print("Lat: ${place.lat}, Lng: ${place.lng}");
+              }
+            },
+            icon: Icon(Icons.my_location, color: AppColors.black),
+            label: Text(
+              "Use Current Location",
+              style: TextStyle(
+                color: AppColors.black,
+                fontFamily: "poppins",
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          Expanded(
+            child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
               ),
@@ -2333,7 +2428,7 @@ class AgentProfile extends StatelessWidget {
                 ),
               ),
             ),
-          ],
+          ),
         ],
       ),
     );

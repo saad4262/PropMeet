@@ -24,6 +24,7 @@ import 'package:propmeet/presentation/views/agent_bottom_bar_view/agent_bottom_b
 import 'package:propmeet/presentation/views/agent_side_views/agent_profile_view/agent_edit_profile_view.dart';
 import 'package:propmeet/presentation/views/agent_side_views/agent_profile_view/agent_subscription_view.dart';
 import 'package:propmeet/presentation/views/bottom_bar_view/bottom_bar_view.dart';
+import 'package:propmeet/presentation/views/chat_view/chatlist_screen.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen2.dart';
 import 'package:propmeet/presentation/views/login_auth/login_screen.dart';
 import 'package:propmeet/presentation/views/onboarding_screen.dart';
@@ -184,5 +185,9 @@ class AppPages {
         );
       }),
     ),
+
+    GetPage(name: AppRoutes.chatListScreen, page: () => ChatListScreen()),
+
+    GetPage(name: AppRoutes.chatScreen, page: () => ChatView()),
   ];
 }

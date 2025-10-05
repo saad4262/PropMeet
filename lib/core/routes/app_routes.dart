@@ -25,6 +25,12 @@ abstract class AppRoutes {
   //just for logout
   static const filterPage='/filterPage';
   static const agentEditProfileView='/agentEditProfileView';
+  static const agentProfileView='/agentProfileView';
+  static const mapScreen='/mapScreen';
+  static const propertyDetailView='/propertyDetailView';
+  static const chatListScreen='/chatListScreen';
+  static const chatScreen='/agentChatScreen';
+  // static const userChatScreen='/userChatScreen';
 
 
 }

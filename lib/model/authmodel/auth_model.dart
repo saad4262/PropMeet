@@ -8,9 +8,9 @@ part 'auth_model.g.dart';
 abstract class Auth with _$Auth {
   const factory Auth({
     required String userId,
-    // @Default('') String displayName,
+    @Default('') String displayName,
     @Default('') String email,
-    // @Default('') String avatarUrl,
+    @Default('') String avatarUrl,
     @Default('user') String tag,
 
     @TimestampConverter() required Timestamp createdAt,

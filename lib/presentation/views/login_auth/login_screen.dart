@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/auth_vm.dart';
+import 'package:propmeet/domain/viewmodels/google_controller.dart';
 import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
@@ -15,7 +16,7 @@ class LoginView extends StatelessWidget {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final authController = Get.find<AuthController>();
-  // final GoogleAuthController controller = Get.find<GoogleAuthController>();
+  final GoogleAuthController controller = Get.put(GoogleAuthController());
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +336,21 @@ class LoginView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        // authController.isLoading.value = true;
+                        // await controller.signInWithGoogle();
+                        // authController.isLoading.value = false;
+
+                        // if (controller.user.value != null) {
+                        //   // await AppNotificationService.saveDeviceToken();
+                        //   // Get.offAllNamed(AppRoutes.home);
+                        // } else {
+                        //   Get.snackbar("Error", "Google Sign-In failed");
+                        // }
+                        authController.isLoading.value = true;
+                        await controller.signInWithGoogle();
+                        authController.isLoading.value = false;
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.white,
                         shape: RoundedRectangleBorder(

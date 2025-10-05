@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "956784528470",
+    "firebase_url": "https://agentswipe-d9e32-default-rtdb.firebaseio.com",
     "project_id": "agentswipe-d9e32",
     "storage_bucket": "agentswipe-d9e32.firebasestorage.app"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "956784528470-mcpv5dror3kbo81hv2eeavms1nt2sh70.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.propmeet",
+            "certificate_hash": "73d2827ed98258208a7f13bd50ec76b6ad1db836"
+          }
+        },
         {
           "client_id": "956784528470-7k8sf08o9sp8lk1m3jrotnslfo7ags9n.apps.googleusercontent.com",
           "client_type": 3
@@ -29,6 +38,13 @@
             {
               "client_id": "956784528470-7k8sf08o9sp8lk1m3jrotnslfo7ags9n.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "956784528470-f9h4b9o3kmq6b0tif009ikafmphku3s2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.propmeet"
+              }
             }
           ]
         }

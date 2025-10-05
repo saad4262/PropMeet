@@ -25,4 +25,7 @@ class AppImages {
   static const sellAgent = "assets/images/sell_agent.svg";
   static const propertyAgent = "assets/images/property_agent.svg";
   static const profile = "assets/images/profile.svg";
+  static const videocall = "assets/images/videocall.svg";
+  static const chatcall = "assets/images/chatcall.svg";
+  static const file = "assets/images/file.svg";
 }

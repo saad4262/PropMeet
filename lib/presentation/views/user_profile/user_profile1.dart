@@ -1,8 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:propmeet/core/routes/app_routes.dart';
 import 'package:propmeet/domain/viewmodels/setupprofile_vm.dart';
+import 'package:propmeet/presentation/views/map_screen.dart';
 import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
@@ -74,14 +77,14 @@ class ProfileSetupScreen extends StatelessWidget {
                   );
                 }
 
-                if (index == 3) {
-                  final pageData = controller.pagesData[index];
+                // if (index == 3) {
+                //   final pageData = controller.pagesData[index];
 
-                  return showSelectedLocation(
-                    pageData["question"] as String,
-                    pageData["subQuestion"] as String?,
-                  );
-                }
+                //   return showSelectedLocation(
+                //     pageData["question"] as String,
+                //     pageData["subQuestion"] as String?,
+                //   );
+                // }
 
                 return _buildPage(
                   index,
@@ -190,7 +193,11 @@ class ProfileSetupScreen extends StatelessWidget {
                             );
                           } else {
                             // ✅ Last page = Finish button
-                            await controller.saveProfileToFirestore();
+                            await controller.saveProfileToFirestore(
+                              controller.selectedPlaceDetails.value?.lat,
+                              controller.selectedPlaceDetails.value?.lng,
+                              controller.selectedPlaceDetails.value?.address,
+                            );
 
                             Get.snackbar(
                               "Success",
@@ -300,8 +307,16 @@ class ProfileSetupScreen extends StatelessWidget {
                               ),
                             ),
                             onSelected:
-                                (_) =>
-                                    controller.setPropertyDetail(title, option),
+                                (_) => controller.setPropertyDetail(
+                                  title,
+                                  option,
+                                  controller.selectedPlaceDetails.value?.lat,
+                                  controller.selectedPlaceDetails.value?.lng,
+                                  controller
+                                      .selectedPlaceDetails
+                                      .value
+                                      ?.address,
+                                ),
                           );
                         }).toList(),
                   );
@@ -351,8 +366,6 @@ class ProfileSetupScreen extends StatelessWidget {
               ],
             ),
           ),
-      
-      
         ],
       ),
     );
@@ -435,7 +448,14 @@ class ProfileSetupScreen extends StatelessWidget {
                 bool isSelected = controller.selections[pageIndex] == i;
 
                 return GestureDetector(
-                  onTap: () => controller.setSelection(pageIndex, i),
+                  onTap:
+                      () => controller.setSelection(
+                        pageIndex,
+                        i,
+                        controller.selectedPlaceDetails.value?.lat,
+                        controller.selectedPlaceDetails.value?.lng,
+                        controller.selectedPlaceDetails.value?.address,
+                      ),
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     width: double.infinity,
@@ -684,24 +704,38 @@ class ProfileSetupScreen extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade400),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              children: [
-                const Icon(Icons.location_on_outlined, color: AppColors.black),
-                const SizedBox(width: 10),
-                Obx(
-                  () => Text(
-                    controller.selectedLocation.value.isEmpty
-                        ? "Enter your location"
-                        : controller.selectedLocation.value,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: "poppins",
+            child: GestureDetector(
+              onTap: () async {
+                final result = await Get.to(() => MapScreen()); // open map
+                if (result != null) {
+                  // Update location in controller
+                  if (result != null) {
+                    // result already PlaceDetails hoga
+                    controller.selectedPlaceDetails.value = result;
+                  }
+                }
+              },
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    color: AppColors.black,
+                  ),
+                  const SizedBox(width: 10),
+                  Obx(
+                    () => Text(
+                      controller.selectedPlaceDetails.value?.address ??
+                          "Enter your location",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "poppins",
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -710,7 +744,12 @@ class ProfileSetupScreen extends StatelessWidget {
           // 🔹 Use current location button
           ElevatedButton.icon(
             onPressed: () {
-              controller.setLocation("User Current Location (from GPS)");
+              controller.getUserCurrentLocation();
+              if (controller.selectedPlaceDetails.value != null) {
+                final place = controller.selectedPlaceDetails.value!;
+                print("📍 Address: ${place.address}");
+                print("Lat: ${place.lat}, Lng: ${place.lng}");
+              }
             },
             icon: Icon(Icons.my_location, color: AppColors.black),
             label: Text(
@@ -866,17 +905,27 @@ class ProfileSetupScreen extends StatelessWidget {
                     color: AppColors.black,
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    controller.selectedLocation.value.isEmpty
-                        ? "No location selected"
-                        : controller.selectedLocation.value,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: "poppins",
-                    ),
-                  ),
+                  Obx(() {
+                    if (controller.selectedPlaceDetails.value?.address ==
+                        null) {
+                      return const Text(
+                        "No location selected",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+
+                    return Text(
+                      "Selected: ${controller.selectedPlaceDetails.value?.address}\n",
+                      // "Lat: ${controller.selectedLat.value}, Lng: ${controller.selectedLng.value}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -887,7 +936,7 @@ class ProfileSetupScreen extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  controller.setLocation("User Current Location (from GPS)");
+                  // controller.setLocation("User Current Location (from GPS)");
                 },
                 icon: Icon(Icons.my_location, color: AppColors.black),
                 label: Text(
@@ -902,17 +951,23 @@ class ProfileSetupScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 30),
-            Obx(
-              () => Text(
-                controller.selectedLocation.value.isNotEmpty
-                    ? "Selected Location: ${controller.selectedLocation.value}"
-                    : "No location selected",
+            Obx(() {
+              if (controller.selectedPlaceDetails.value?.address == null) {
+                return const Text(
+                  "No location selected",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                );
+              }
+
+              return Text(
+                "Selected: ${controller.selectedPlaceDetails.value?.address}\n",
+                // "Lat: ${controller.selectedLat.value}, Lng: ${controller.selectedLng.value}",
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
-              ),
-            ),
+              );
+            }),
           ],
         ),
       ),

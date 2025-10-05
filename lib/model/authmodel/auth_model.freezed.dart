@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Auth {
 
- String get userId;// @Default('') String displayName,
- String get email;// @Default('') String avatarUrl,
- String get tag;@TimestampConverter() Timestamp get createdAt;@TimestampConverter() Timestamp get updatedAt;
+ String get userId; String get displayName; String get email; String get avatarUrl; String get tag;@TimestampConverter() Timestamp get createdAt;@TimestampConverter() Timestamp get updatedAt;
 /// Create a copy of Auth
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,16 +28,16 @@ $AuthCopyWith<Auth> get copyWith => _$AuthCopyWithImpl<Auth>(this as Auth, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Auth&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.tag, tag) || other.tag == tag)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Auth&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.tag, tag) || other.tag == tag)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,email,tag,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,userId,displayName,email,avatarUrl,tag,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'Auth(userId: $userId, email: $email, tag: $tag, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'Auth(userId: $userId, displayName: $displayName, email: $email, avatarUrl: $avatarUrl, tag: $tag, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -50,7 +48,7 @@ abstract mixin class $AuthCopyWith<$Res>  {
   factory $AuthCopyWith(Auth value, $Res Function(Auth) _then) = _$AuthCopyWithImpl;
 @useResult
 $Res call({
- String userId, String email, String tag,@TimestampConverter() Timestamp createdAt,@TimestampConverter() Timestamp updatedAt
+ String userId, String displayName, String email, String avatarUrl, String tag,@TimestampConverter() Timestamp createdAt,@TimestampConverter() Timestamp updatedAt
 });
 
 
@@ -67,10 +65,12 @@ class _$AuthCopyWithImpl<$Res>
 
 /// Create a copy of Auth
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? tag = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? displayName = null,Object? email = null,Object? avatarUrl = null,Object? tag = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,avatarUrl: null == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String,tag: null == tag ? _self.tag : tag // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as Timestamp,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -159,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String email,  String tag, @TimestampConverter()  Timestamp createdAt, @TimestampConverter()  Timestamp updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String displayName,  String email,  String avatarUrl,  String tag, @TimestampConverter()  Timestamp createdAt, @TimestampConverter()  Timestamp updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Auth() when $default != null:
-return $default(_that.userId,_that.email,_that.tag,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.userId,_that.displayName,_that.email,_that.avatarUrl,_that.tag,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -180,10 +180,10 @@ return $default(_that.userId,_that.email,_that.tag,_that.createdAt,_that.updated
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String email,  String tag, @TimestampConverter()  Timestamp createdAt, @TimestampConverter()  Timestamp updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String displayName,  String email,  String avatarUrl,  String tag, @TimestampConverter()  Timestamp createdAt, @TimestampConverter()  Timestamp updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Auth():
-return $default(_that.userId,_that.email,_that.tag,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.userId,_that.displayName,_that.email,_that.avatarUrl,_that.tag,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +200,10 @@ return $default(_that.userId,_that.email,_that.tag,_that.createdAt,_that.updated
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String email,  String tag, @TimestampConverter()  Timestamp createdAt, @TimestampConverter()  Timestamp updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String displayName,  String email,  String avatarUrl,  String tag, @TimestampConverter()  Timestamp createdAt, @TimestampConverter()  Timestamp updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Auth() when $default != null:
-return $default(_that.userId,_that.email,_that.tag,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.userId,_that.displayName,_that.email,_that.avatarUrl,_that.tag,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -215,13 +215,13 @@ return $default(_that.userId,_that.email,_that.tag,_that.createdAt,_that.updated
 @JsonSerializable()
 
 class _Auth implements Auth {
-  const _Auth({required this.userId, this.email = '', this.tag = 'user', @TimestampConverter() required this.createdAt, @TimestampConverter() required this.updatedAt});
+  const _Auth({required this.userId, this.displayName = '', this.email = '', this.avatarUrl = '', this.tag = 'user', @TimestampConverter() required this.createdAt, @TimestampConverter() required this.updatedAt});
   factory _Auth.fromJson(Map<String, dynamic> json) => _$AuthFromJson(json);
 
 @override final  String userId;
-// @Default('') String displayName,
+@override@JsonKey() final  String displayName;
 @override@JsonKey() final  String email;
-// @Default('') String avatarUrl,
+@override@JsonKey() final  String avatarUrl;
 @override@JsonKey() final  String tag;
 @override@TimestampConverter() final  Timestamp createdAt;
 @override@TimestampConverter() final  Timestamp updatedAt;
@@ -239,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Auth&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.tag, tag) || other.tag == tag)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Auth&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.tag, tag) || other.tag == tag)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,email,tag,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,userId,displayName,email,avatarUrl,tag,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'Auth(userId: $userId, email: $email, tag: $tag, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'Auth(userId: $userId, displayName: $displayName, email: $email, avatarUrl: $avatarUrl, tag: $tag, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -259,7 +259,7 @@ abstract mixin class _$AuthCopyWith<$Res> implements $AuthCopyWith<$Res> {
   factory _$AuthCopyWith(_Auth value, $Res Function(_Auth) _then) = __$AuthCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String email, String tag,@TimestampConverter() Timestamp createdAt,@TimestampConverter() Timestamp updatedAt
+ String userId, String displayName, String email, String avatarUrl, String tag,@TimestampConverter() Timestamp createdAt,@TimestampConverter() Timestamp updatedAt
 });
 
 
@@ -276,10 +276,12 @@ class __$AuthCopyWithImpl<$Res>
 
 /// Create a copy of Auth
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? tag = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? displayName = null,Object? email = null,Object? avatarUrl = null,Object? tag = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_Auth(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,avatarUrl: null == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String,tag: null == tag ? _self.tag : tag // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as Timestamp,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable

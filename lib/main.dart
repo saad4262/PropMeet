@@ -42,9 +42,8 @@ class MyApp extends StatelessWidget {
       title: 'PropMeet',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.lightTheme,
-      themeMode: ThemeMode.light,
-      initialRoute: AppRoutes.splash,
+      darkTheme: AppTheme.darkTheme,
+      initialRoute: AppRoutes.chatListScreen,
       getPages: AppPages.routes,
     );
   }
