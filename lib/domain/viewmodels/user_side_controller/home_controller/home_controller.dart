@@ -323,6 +323,7 @@ class HomeController extends GetxController {
       startProgressTimer();
     }
   }
+
   @override
   bool onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
     _progressTimer?.cancel();
@@ -345,8 +346,11 @@ class HomeController extends GetxController {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
     if (direction == CardSwiperDirection.right) {
+
       likedNames.add(swipedUser['name'] ?? '');
       swipeAction.value = SwipeAction.like;
+      handleLikeSwipe(currentUserId ?? "", agentId, swipedUser)
+          .catchError((e) => print("handleLikeSwipe error: $e"));
 
       // Record swipe in swipe collection (your existing logic)
       swipeRepo.recordSwipe(
@@ -377,7 +381,6 @@ class HomeController extends GetxController {
       favouriteController.fetchFavouriteAgents();
 
       showSnackBar(swipedUser['name'] ?? '', action: "like");
-
     } else if (direction == CardSwiperDirection.left) {
       swipeAction.value = SwipeAction.dislike;
 
@@ -388,10 +391,23 @@ class HomeController extends GetxController {
         targetType: UserType.agent,
       ).catchError((e) => print('recordSwipe dislike error: $e'));
 
+      if (currentUserId != null && currentUserId.isNotEmpty) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUserId)
+            .collection('favourites')
+            .doc(agentId)
+            .delete()
+            .then((_) =>
+            print('💔 Removed ${swipedUser['name']} from favourites'))
+            .catchError((e) => print('🔥 Error removing favourite: $e'));
+      }
+
+      // Optionally refresh local list immediately
+      favouriteController.fetchFavouriteAgents();
+
       showSnackBar(swipedUser['name'] ?? '', action: "dislike");
     }
-
-    startProgressTimer();
     return true;
   }
 
@@ -441,6 +457,58 @@ class HomeController extends GetxController {
       ),
     );
   }
+
+
+  Future<void> handleLikeSwipe(String currentUserId, String targetUserId, Map<String, dynamic> swipedUser) async {
+    final swipeDocId = "${currentUserId}_$targetUserId";
+    final reverseSwipeDocId = "${targetUserId}_$currentUserId";
+
+    final swipesRef = FirebaseFirestore.instance.collection('swipes');
+    final notifRef = FirebaseFirestore.instance.collection('users');
+
+    // Record the swipe
+    await swipesRef.doc(swipeDocId).set({
+      "swiperId": currentUserId,
+      "targetId": targetUserId,
+      "liked": true,
+      "timestamp": FieldValue.serverTimestamp(),
+    });
+
+    // Check if reverse swipe exists (target also liked currentUser)
+    final reverseSwipe = await swipesRef.doc(reverseSwipeDocId).get();
+
+    if (reverseSwipe.exists && reverseSwipe['liked'] == true) {
+      // ✅ It's a match!
+      await notifRef.doc(currentUserId).collection('notifications').add({
+        "fromUserId": targetUserId,
+        "fromUserName": swipedUser['name'],
+        "fromUserImage": swipedUser['image'],
+        "type": "match",
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+
+      await notifRef.doc(targetUserId).collection('notifications').add({
+        "fromUserId": currentUserId,
+        "fromUserName": "You", // replace with actual name
+        "fromUserImage": "...",
+        "type": "match",
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+    } else {
+      // ✅ Just a like notification
+      await notifRef.doc(targetUserId).collection('notifications').add({
+        "fromUserId": currentUserId,
+        "fromUserName": swipedUser['name'],
+        "fromUserImage": swipedUser['image'],
+        "type": "like",
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+
+
+
 
   @override
   void onClose() {

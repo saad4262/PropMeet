@@ -1,103 +1,66 @@
-// file: presentation/views/user_side_views/notifications_view.dart
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:get/get.dart';
+import '../../../../domain/viewmodels/user_side_controller/home_controller/notification_controller.dart';
 
-import '../../../../data/repositories/swipes_repository/swipes_repository.dart';
-
-class NotificationsView extends StatelessWidget {
-  final UserType userType; // pass agent/user
-  const NotificationsView({super.key, required this.userType});
+class NotificationView extends StatelessWidget {
+  final NotificationController controller = Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return const Scaffold(body: Center(child: Text("Not logged in")));
-
-    final collectionName = userType == UserType.agent ? 'agentProfile' : 'profile_user';
-
-
-    return Scaffold(
-      appBar: AppBar(title: Text("Notifications")),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection(collectionName)
-            .doc(uid)
-            .collection('notifications')
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Notifications"),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: "Likes"),
+              Tab(text: "Matches"),
+            ],
+          ),
+        ),
+        body: Obx(() {
+          if (controller.notifications.isEmpty) {
+            return Center(child: Text("No notifications yet", style: TextStyle(fontSize: 12),));
           }
 
-          if (!snap.hasData || snap.data!.docs.isEmpty) {
-            return const Center(child: Text("No notifications yet", style: TextStyle(fontSize: 12),));
-          }
+          final likes = controller.notifications
+              .where((n) => n['type'] == 'like')
+              .toList();
+          final matches = controller.notifications
+              .where((n) => n['type'] == 'match')
+              .toList();
 
-          final docs = snap.data!.docs;
-
-          return ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context, i) {
-              final data = docs[i].data() as Map<String, dynamic>;
-              final type = data['type'] ?? 'info';
-              final fromName = (data['fromName'] != null && data['fromName'].toString().trim().isNotEmpty)
-                  ? data['fromName']
-                  : (data['fromEmail'] ?? 'Some User');
-
-              final read = data['read'] ?? false;
-
-              final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
-              final formattedTime = createdAt != null
-                  ? DateFormat('dd MMM yyyy, hh:mm a').format(createdAt)
-                  : '';
-
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                color: read ? Colors.white : Colors.blue.withOpacity(0.07),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: type == 'match' ? Colors.pinkAccent : Colors.blueAccent,
-                    child: Icon(
-                      type == 'match' ? Icons.favorite : Icons.person,
-                      color: Colors.white,
-                    ),
-                  ),
-                  title: Text(
-                    type == 'match'
-                        ? "You matched with $fromName"
-                        : (type == 'liked'
-                        ? "$fromName liked you"
-                        : "$type"),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                ),
-                  subtitle: Text(
-                    formattedTime,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                  ),
-                  onTap: () {
-                    // Mark notification as read
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(uid)
-                        .collection('notifications')
-                        .doc(docs[i].id)
-                        .update({'read': true});
-                  },
-                ),
-              );
-            },
+          return TabBarView(
+            children: [
+              buildList(likes, "❤️"),
+              buildList(matches, "🎉"),
+            ],
           );
-        },
+        }),
       ),
+    );
+  }
+
+  Widget buildList(List notifs, String icon) {
+    if (notifs.isEmpty) {
+      return Center(child: Text("No $icon notifications"));
+    }
+    return ListView.builder(
+      itemCount: notifs.length,
+      itemBuilder: (context, index) {
+        final notif = notifs[index];
+        final email = notif['fromUserEmail'] ?? 'Unknown';
+        final createdAt = notif['createdAt'] != null
+            ? notif['createdAt'].toDate().toString()
+            : "";
+
+        return ListTile(
+          leading: CircleAvatar(child: Text(icon)),
+          title: Text(email),
+          subtitle: Text(createdAt, style: TextStyle(fontSize: 10)),
+        );
+      },
     );
   }
 }

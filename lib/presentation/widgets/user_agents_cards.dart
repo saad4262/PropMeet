@@ -36,10 +36,8 @@ class UserAgentsCards extends StatelessWidget {
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                imagePath ?? AppAssets.user2,
-                fit: BoxFit.cover,
-              ),
+              child: _buildImage(imagePath),
+
             ),
           ),
 
@@ -99,6 +97,30 @@ class UserAgentsCards extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+Widget _buildImage(String? path) {
+  if (path == null || path.isEmpty) {
+    // fallback to default asset
+    return Image.asset(
+      AppAssets.user3,
+      fit: BoxFit.cover,
+    );
+  } else if (path.startsWith('http')) {
+    // Firebase Storage / online images
+    return Image.network(
+      path,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Image.asset(AppAssets.user3, fit: BoxFit.cover); // fallback
+      },
+    );
+  } else {
+    // Local asset
+    return Image.asset(
+      path,
+      fit: BoxFit.cover,
     );
   }
 }

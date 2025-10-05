@@ -189,11 +189,11 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.notificationScreenUser,
-      page: () => NotificationsView(userType: UserType.user),
+      page: () => NotificationView(),
     ),
     GetPage(
       name: AppRoutes.notificationScreenAgent,
-      page: () => NotificationsView(userType: UserType.agent),
+      page: () => NotificationView(),
     ),
   ];
 }
