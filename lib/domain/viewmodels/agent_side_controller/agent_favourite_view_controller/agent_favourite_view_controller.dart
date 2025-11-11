@@ -91,7 +91,7 @@ class AgentFavouriteViewController extends GetxController {
             favouriteUsers.assignAll(users);
 
             for (var u in favouriteUsers) {
-              print("⭐ Favourite User: id=${u.userId}, name=${u.name}, email=${u.email}, location=${u.location}");
+              print("⭐ Favourite User: id=${u.userId}, displayName=${u.displayName}, email=${u.email}, location=${u.location}");
             }
           } catch (e) {
             print("❌ Firestore query error: $e");

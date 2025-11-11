@@ -23,7 +23,13 @@ class UserProfileView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.goldenBackgroundColor,
-      appBar: CustomUserAppbar(title: 'App Name'),
+      appBar: CustomUserAppbar(title: 'App Name',
+        trailing:
+        IconButton(
+          icon: Icon(Icons.refresh, color: AppColors.primary),
+          onPressed: () => controller.listenToProfileChanges()
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: Container(

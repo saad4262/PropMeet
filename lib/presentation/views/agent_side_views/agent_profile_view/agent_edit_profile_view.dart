@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:propmeet/presentation/widgets/custom_button.dart';
+import 'package:propmeet/presentation/widgets/custom_button.dart' hide CustomButton;
 import '../../../../../shared/constants/app_colors.dart';
 import '../../../../../shared/utils/responsive_utils.dart';
 import '../../../../../shared/config/app_assets/app_assets.dart';
 import '../../../../../domain/viewmodels/agent_side_controller/agent_profile_view_controller/agent_edit_profile_view_controller.dart';
 import '../../../widgets/custom_user_appBar.dart';
+import '../../../widgets/custom_button.dart';
+import '../../agent_map_screen.dart' hide CustomButton;
 
 class AgentEditProfileView extends StatelessWidget {
   AgentEditProfileView({super.key});
 
-  final AgentEditProfileViewController controller =
-  Get.put(AgentEditProfileViewController());
 
+  final AgentEditProfileViewController controller=Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +53,8 @@ class AgentEditProfileView extends StatelessWidget {
               const SizedBox(height: 12),
               _buildPerformanceCard(controller),
               const SizedBox(height: 12),
-              Center(child: CustomButton(width: 200, height: 50, text: 'Close', onPressed: (){Get.back();}))
+             Center(child: CustomButton(text: 'Close', onPressed: (){Get.back();}, width: 200, height: 50,),)
+
               ,const SizedBox(height: 12),
             ],
           ),
@@ -70,6 +72,9 @@ class AgentEditProfileView extends StatelessWidget {
         _buildTextField("Last Name", c.lastNameController, c.isEditing.value),
         _buildTextField("Title", c.titleController, c.isEditing.value),
         _buildTextField("Bio", c.bioController, c.isEditing.value, maxLines: 3),
+       // _buildLocationField(c),
+
+      //  _buildTextField("Location", c.locationController, c.isEditing.value),
       ],
     );
   }
@@ -247,3 +252,53 @@ class AgentEditProfileView extends StatelessWidget {
     );
   }
 }
+Widget _buildLocationField(AgentEditProfileViewController c) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Obx(() {
+      final editable = c.isEditing.value;
+      final address = c.selectedPlaceDetails.value?.address ?? c.locationController.text;
+
+      return GestureDetector(
+        onTap: editable
+            ? () async {
+          final result = await Get.to(() => AgentMapScreen());
+          if (result != null) {
+            c.selectedPlaceDetails.value = result;
+          }
+        }
+            : null, // disable tap when not editing
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.location_on_outlined, color: Colors.black),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  address.isNotEmpty ? address : "Enter your location",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: Responsive.fontSize(3.5),
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              if (editable)
+                const Icon(Icons.edit_location_alt_outlined,
+                    color: Colors.blue, size: 20),
+            ],
+          ),
+        ),
+      );
+    }),
+  );
+}
+
+

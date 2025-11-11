@@ -10,7 +10,7 @@ import 'package:propmeet/shared/utils/responsive_utils.dart';
 class EditUserProfile extends StatelessWidget {
   EditUserProfile({super.key});
 
-  final controller = Get.put(EditUserProfileViewController());
+  final EditUserProfileViewController controller=Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +21,13 @@ class EditUserProfile extends StatelessWidget {
         centerTitle: true,
         title: Text('Edit Profile', style: TextStyle(color: AppColors.black, fontSize: Responsive.fontSize(5), fontWeight: FontWeight.w600),),
       actions: [
-        IconButton(onPressed: (){
-          controller.saveProfile;
-        }, icon: Icon(Icons.done, color: AppColors.primary,)),
+        IconButton(
+          onPressed: () async {
+            await controller.saveProfile();
+          },
+          icon: Icon(Icons.done, color: AppColors.primary),
+        ),
+
       ],
       ),
       body: Obx(() {

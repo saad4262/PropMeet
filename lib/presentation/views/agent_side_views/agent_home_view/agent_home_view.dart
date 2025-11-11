@@ -166,7 +166,7 @@ class AgentHomeView extends StatelessWidget {
                           user: {
                             "name": card.email,
                             "email": card.email,
-                            "location": "Lahore, Punjab",
+                            "location": card.location,
                             "bedrooms": card.propertyDetails.bedrooms.toString(),
                             "bathrooms": card.propertyDetails.bathrooms.toString(),
                             "parking": card.propertyDetails.carSpaces.toString(),
@@ -179,7 +179,7 @@ class AgentHomeView extends StatelessWidget {
                             "valueRange": card.propertyDetails.value,
                           },
                           progress: controller.progress.value,
-                          isLiked: controller.likedNames.contains(card.name),
+                          isLiked: controller.likedNames.contains(card.displayName),
                           swipeAction: controller.swipeAction.value,
                           swipedCardName: controller.swipedCardName.value,
                           previewAction: controller.swipePreviewDirection.value,

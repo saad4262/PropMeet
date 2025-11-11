@@ -87,8 +87,8 @@ class _UserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayName = user.name?.isNotEmpty == true
-        ? user.name!
+    final displayName = user.displayName?.isNotEmpty == true
+        ? user.displayName!
         : _extractNameFromEmail(user.email);
 
     return Card(
@@ -103,9 +103,10 @@ class _UserCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: Responsive.height(5)),
+            SizedBox(height: Responsive.height(2)),
             Center(
               child: Container(
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -113,20 +114,50 @@ class _UserCard extends StatelessWidget {
                     width: 5,
                   ),
                 ),
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    displayName.isNotEmpty ? displayName[0].toUpperCase() : "?",
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(60), // Controls how "oval" it looks
+                  child: Container(
+                    width: 70,  // slightly wider
+                    height: 85, // slightly taller → egg shape
+                    color: AppColors.primary,
+                    alignment: Alignment.center,
+                    child: Text(
+                      displayName.isNotEmpty ? displayName[0].toUpperCase() : "?",
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
+
+
+            // Center(
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       shape: BoxShape.circle,
+            //       border: Border.all(
+            //         color: AppColors.goldenBackgroundColor,
+            //         width: 5,
+            //       ),
+            //     ),
+            //     child: CircleAvatar(
+            //       radius: 30,
+            //       backgroundColor: AppColors.primary,
+            //       child: Text(
+            //         displayName.isNotEmpty ? displayName[0].toUpperCase() : "?",
+            //         style: const TextStyle(
+            //           fontSize: 22,
+            //           fontWeight: FontWeight.bold,
+            //           color: Colors.white
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
             SizedBox(height: Responsive.height(1.5)),
             Padding(
@@ -153,14 +184,17 @@ class _UserCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    "lahore",
-                 //   user.location.isNotEmpty ? user.location : "Unknown location",
-                    style: TextStyle(
-                      color: Colors.grey.shade300,
-                      fontSize: 13,
-                    ),
-                  ),
+                 Text(
+                 //  "lahore",
+                  user.location.isNotEmpty ? user.location : "--",
+                   style: TextStyle(
+                     color: Colors.grey.shade300,
+                     fontSize: 13,
+                   ),
+                   softWrap: true,
+                   maxLines: 2,
+                   overflow: TextOverflow.ellipsis,
+                 ),
                 ],
               ),
             ),

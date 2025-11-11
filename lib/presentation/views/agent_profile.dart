@@ -11,6 +11,8 @@ import 'package:propmeet/shared/constants/app_colors.dart';
 import 'package:propmeet/shared/constants/app_images.dart';
 import 'package:propmeet/shared/utils/responsive_utils.dart';
 
+import 'agent_map_screen.dart';
+
 class AgentProfile extends StatelessWidget {
   final ProfileSetupController controller = Get.put(ProfileSetupController());
   final PageController pageController = PageController();
@@ -2237,6 +2239,202 @@ class AgentProfile extends StatelessWidget {
     );
   }
 
+  // Widget buildFieldPage8(Map<String, dynamic> page) {
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(horizontal: Responsive.padding(2.5)),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         // 🔹 Question
+  //         Padding(
+  //           padding: EdgeInsets.symmetric(horizontal: Responsive.padding(2.5)),
+  //           child: Align(
+  //             alignment: Alignment.centerLeft,
+  //             child: Column(
+  //               children: [
+  //                 if (page["question"] != null)
+  //                   Text(
+  //                     page["question"],
+  //                     style: TextStyle(
+  //                       fontSize: Responsive.fontSize(4.5),
+  //                       fontWeight: FontWeight.bold,
+  //                       fontFamily: "poppins",
+  //                       color: AppColors.black,
+  //                     ),
+  //                   ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //         SizedBox(height: Responsive.height(2)),
+  //         Padding(
+  //           padding: EdgeInsets.only(
+  //             left: Responsive.padding(2.5),
+  //             right: Responsive.padding(9),
+  //           ),
+  //           child: Align(
+  //             alignment: Alignment.centerLeft,
+  //             child: Column(
+  //               children: [
+  //                 if (page["subQuestion"] != null)
+  //                   Text(
+  //                     page["subQuestion"],
+  //                     style: TextStyle(
+  //                       fontSize: Responsive.fontSize(3.3),
+  //                       color: AppColors.black,
+  //                       fontFamily: 'Poppins',
+  //                     ),
+  //                   ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //
+  //         SizedBox(height: Responsive.height(2)),
+  //
+  //         Padding(
+  //           padding: EdgeInsets.only(left: Responsive.padding(2)),
+  //           child: Container(
+  //             height: Responsive.height(13),
+  //             width: Responsive.width(90),
+  //             decoration: BoxDecoration(
+  //               color: AppColors.secondaryBlue,
+  //               border: Border.all(color: AppColors.lightBlue),
+  //               borderRadius: BorderRadius.circular(15),
+  //             ),
+  //             child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.start,
+  //               crossAxisAlignment: CrossAxisAlignment.center,
+  //               children: [
+  //                 SizedBox(width: Responsive.width(2)),
+  //
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: SvgPicture.asset(AppImages.shield),
+  //                 ),
+  //                 SizedBox(width: Responsive.width(3)),
+  //                 // ✅ Wrap Column in Expanded
+  //                 Expanded(
+  //                   child: Column(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         "Your Address is protected",
+  //                         style: TextStyle(
+  //                           color: AppColors.blueMain,
+  //                           fontFamily: "poppins",
+  //                           fontSize: Responsive.fontSize(4),
+  //                         ),
+  //                         maxLines: 1,
+  //                         overflow: TextOverflow.ellipsis,
+  //                       ),
+  //                       const SizedBox(height: 4),
+  //                       Text(
+  //                         "Your address stays private until you choose to share it with agent",
+  //                         style: TextStyle(
+  //                           color: AppColors.grey,
+  //                           fontFamily: "poppins",
+  //                           fontSize: Responsive.fontSize(3.2),
+  //                         ),
+  //                         maxLines: 2,
+  //                         overflow: TextOverflow.ellipsis,
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //         SizedBox(height: Responsive.height(2)),
+  //
+  //         // 🔹 Search Field
+  //         Container(
+  //           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  //           decoration: BoxDecoration(
+  //             border: Border.all(color: Colors.grey.shade400),
+  //             borderRadius: BorderRadius.circular(12),
+  //           ),
+  //           child: GestureDetector(
+  //             onTap: () async {
+  //               final result = await Get.to(() => MapScreen()); // open map
+  //               if (result != null) {
+  //                 // Update location in controller
+  //                 if (result != null) {
+  //                   // result already PlaceDetails hoga
+  //                   controller.selectedPlaceDetails.value = result;
+  //                 }
+  //               }
+  //             },
+  //             child: Row(
+  //               children: [
+  //                 const Icon(
+  //                   Icons.location_on_outlined,
+  //                   color: AppColors.black,
+  //                 ),
+  //                 const SizedBox(width: 10),
+  //                 Obx(
+  //                   () => Text(
+  //                     controller.selectedPlaceDetails.value?.address ??
+  //                         "Enter your location",
+  //                     style: TextStyle(
+  //                       fontSize: 16,
+  //                       color: Colors.grey.shade600,
+  //                       fontWeight: FontWeight.w500,
+  //                       fontFamily: "poppins",
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //
+  //         const SizedBox(height: 20),
+  //
+  //         // 🔹 Use current location button
+  //         ElevatedButton.icon(
+  //           onPressed: () {
+  //             controller.getUserCurrentLocation();
+  //             if (controller.selectedPlaceDetails.value != null) {
+  //               final place = controller.selectedPlaceDetails.value!;
+  //               print("📍 Address: ${place.address}");
+  //               print("Lat: ${place.lat}, Lng: ${place.lng}");
+  //             }
+  //           },
+  //           icon: Icon(Icons.my_location, color: AppColors.black),
+  //           label: Text(
+  //             "Use Current Location",
+  //             style: TextStyle(
+  //               color: AppColors.black,
+  //               fontFamily: "poppins",
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //         ),
+  //
+  //         const SizedBox(height: 30),
+  //
+  //         Expanded(
+  //           child: Container(
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(30),
+  //             ),
+  //             child: Center(
+  //               child: Image.asset(
+  //                 AppImages.map2,
+  //                 fit: BoxFit.cover,
+  //                 width: Responsive.width(85),
+  //                 height: double.infinity,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget buildFieldPage8(Map<String, dynamic> page) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: Responsive.padding(2.5)),
@@ -2356,7 +2554,7 @@ class AgentProfile extends StatelessWidget {
             ),
             child: GestureDetector(
               onTap: () async {
-                final result = await Get.to(() => MapScreen()); // open map
+                final result = await Get.to(() => AgentMapScreen()); // open map
                 if (result != null) {
                   // Update location in controller
                   if (result != null) {
@@ -2373,11 +2571,14 @@ class AgentProfile extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Obx(
-                    () => Text(
+                        () => Text(
                       controller.selectedPlaceDetails.value?.address ??
                           "Enter your location",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
+                        overflow: TextOverflow.ellipsis,
                         color: Colors.grey.shade600,
                         fontWeight: FontWeight.w500,
                         fontFamily: "poppins",
@@ -2434,6 +2635,7 @@ class AgentProfile extends StatelessWidget {
     );
   }
 
+  // Widget buildFieldPage2(Map<String, dynamic> page) {
   // Widget buildFieldPage2(Map<String, dynamic> page) {
 
   //   return SingleChildScrollView(

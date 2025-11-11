@@ -7,38 +7,19 @@ class SwipeRepository {
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-  // 🔹 Unified way to get correct subcollection path
-  String _collectionPath(UserType type) {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) throw Exception("User not logged in");
-
-    return type == UserType.agent
-        ? 'users/$userId/agentProfile/profile'
-        : 'users/$userId/profile_user/setupData';
-  }
-
-  /// ✅ Called on swipe action
+  /// ✅ Main swipe handler
   Future<void> recordSwipe({
     required String targetId,
     required bool liked,
     required UserType currentUserType,
-    required UserType targetType,
   }) async {
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId == null) return;
 
     if (liked) {
-      await _handleLike(
-        likerId: currentUserId,
-        likedId: targetId,
-        likerIsUser: currentUserType == UserType.user,
-      );
+      await _handleLike(likerId: currentUserId, likedId: targetId);
     } else {
-      await _handleDislike(
-        dislikerId: currentUserId,
-        dislikedId: targetId,
-        dislikerIsUser: currentUserType == UserType.user,
-      );
+      await _handleDislike(dislikerId: currentUserId, dislikedId: targetId);
     }
   }
 
@@ -46,39 +27,25 @@ class SwipeRepository {
   Future<void> _handleLike({
     required String likerId,
     required String likedId,
-    required bool likerIsUser,
   }) async {
-    final likerCollection =
-    likerIsUser ? 'users/$likerId/profile_user/setupData' : 'users/$likerId/agentProfile/profile';
-    final likedCollection =
-    likerIsUser ? 'users/$likedId/agentProfile/profile' : 'users/$likedId/profile_user/setupData';
+    final likerRef = _db.collection('swipes').doc(likerId);
+    final likedRef = _db.collection('swipes').doc(likedId);
 
-    final likerRef = _db.doc(likerCollection);
-    final likedRef = _db.doc(likedCollection);
-
-    // Add liked user to liker’s liked list
+    // ✅ Add liked user to liker’s liked list
     await likerRef.set({
-      'swipes': {
-        'liked': FieldValue.arrayUnion([likedId])
-      }
+      'liked': FieldValue.arrayUnion([likedId])
     }, SetOptions(merge: true));
 
-    // Check if target already liked back
+    // ✅ Fetch liked user’s swipe data
     final likedSnap = await likedRef.get();
     final likedData = likedSnap.data();
-    final theirLikes = (likedData?['swipes']?['liked'] as List?) ?? [];
+    final theirLikes = (likedData?['liked'] as List?) ?? [];
 
+    // 🎯 Check for mutual like
     if (theirLikes.contains(likerId)) {
-      // 🎯 Mutual match
-      await _saveMatch(likerRef, likedRef, likerId, likedId);
+      await _saveMatch(likerId, likedId);
     } else {
-      // 💌 Notify target about "like"
-      await _createNotification(
-        receiverRef: likedRef,
-        senderId: likerId,
-        type: 'liked',
-        senderIsUser: likerIsUser,
-      );
+      await _createNotification(receiverId: likedId, senderId: likerId, type: 'liked');
     }
   }
 
@@ -86,107 +53,51 @@ class SwipeRepository {
   Future<void> _handleDislike({
     required String dislikerId,
     required String dislikedId,
-    required bool dislikerIsUser,
   }) async {
-    final dislikerCollection =
-    dislikerIsUser ? 'users/$dislikerId/profile_user/setupData' : 'users/$dislikerId/agentProfile/profile';
-    final dislikerRef = _db.doc(dislikerCollection);
-
+    final dislikerRef = _db.collection('swipes').doc(dislikerId);
     await dislikerRef.set({
-      'swipes': {
-        'disliked': FieldValue.arrayUnion([dislikedId])
-      }
+      'disliked': FieldValue.arrayUnion([dislikedId])
     }, SetOptions(merge: true));
   }
 
   /// 🎯 Save mutual match
-  Future<void> _saveMatch(
-      DocumentReference likerRef,
-      DocumentReference likedRef,
-      String likerId,
-      String likedId,
-      ) async {
-    await likerRef.set({
-      'swipes': {
-        'matched': FieldValue.arrayUnion([likedId])
-      }
+  Future<void> _saveMatch(String userA, String userB) async {
+    final refA = _db.collection('swipes').doc(userA);
+    final refB = _db.collection('swipes').doc(userB);
+
+    await refA.set({
+      'matched': FieldValue.arrayUnion([userB])
     }, SetOptions(merge: true));
 
-    await likedRef.set({
-      'swipes': {
-        'matched': FieldValue.arrayUnion([likerId])
-      }
+    await refB.set({
+      'matched': FieldValue.arrayUnion([userA])
     }, SetOptions(merge: true));
 
     // 🔔 Notify both users
-    await _createNotification(
-        receiverRef: likedRef, senderId: likerId, type: 'match');
-    await _createNotification(
-        receiverRef: likerRef, senderId: likedId, type: 'match');
+    await _createNotification(receiverId: userB, senderId: userA, type: 'match');
+    await _createNotification(receiverId: userA, senderId: userB, type: 'match');
   }
 
   /// 🔔 Create Firestore notification document
   Future<void> _createNotification({
-    required DocumentReference receiverRef,
+    required String receiverId,
     required String senderId,
     required String type,
-    bool? senderIsUser,
   }) async {
-    final senderCollection = senderIsUser == null
-        ? 'profile_user'
-        : (senderIsUser ? 'users/$senderId/profile_user/setupData' : 'users/$senderId/agentProfile/profile');
-
-    final senderDoc = await _db.doc(senderCollection).get();
+    final senderDoc = await _db.collection('users').doc(senderId).get();
     final senderData = senderDoc.data() ?? {};
-    final senderName = senderData['firstName'] ??
-        senderData['name'] ??
-        senderData['email'] ??
-        'Someone';
+    final senderName = senderData['firstName'] ?? senderData['name'] ?? senderData['email'] ?? 'Someone';
 
-    await receiverRef.collection('notifications').add({
-      'type': type, // liked / match
+    await _db
+        .collection('notifications')
+        .doc(receiverId)
+        .collection('userNotifications')
+        .add({
+      'type': type,
       'fromId': senderId,
       'fromName': senderName,
       'read': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
-
-    // 🚀 (Later — FCM push)
-    // final receiverToken = (await receiverRef.get()).data()?['fcmToken'];
-    // if (receiverToken != null) sendPush(receiverToken, type, senderName);
   }
-
-  Future<void> likeAgent(String agentId, String agentName, String userName, String userEmail) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    final userId = user.uid;
-
-    // Save favourite relationship
-    await FirebaseFirestore.instance
-        .collection('profile_user')
-        .doc(userId)
-        .collection('favourites')
-        .doc(agentId)
-        .set({
-      'agentId': agentId,
-      'likedAt': FieldValue.serverTimestamp(),
-    });
-
-    // Create a notification for that agent
-    await FirebaseFirestore.instance
-        .collection('agentProfile')
-        .doc(agentId)
-        .collection('notifications')
-        .add({
-      'type': 'liked',
-      'fromId': userId,
-      'fromName': userName,
-      'fromEmail': userEmail,
-      'createdAt': FieldValue.serverTimestamp(),
-      'read': false,
-    });
-  }
-
-
 }

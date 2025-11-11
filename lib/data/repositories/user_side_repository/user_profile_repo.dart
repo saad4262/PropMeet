@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 import '../../../model/agent_model/agent_model.dart';
 import '../../../model/user_model/user_model.dart';
 
@@ -30,7 +31,7 @@ class UserProfileRepository {
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).set({
-      "name": user.name,
+      "displayName": user.displayName,
       "email": user.email,
       "createdAt": FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
@@ -48,6 +49,34 @@ class UserProfileRepository {
     }, SetOptions(merge: true));
   }
 
+
+  Stream<UserModel?> streamUserProfile() {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return const Stream.empty();
+
+    final userDocStream = _db.collection('users').doc(uid).snapshots();
+    final setupDocStream = _db
+        .collection('users')
+        .doc(uid)
+        .collection('profile_user')
+        .doc('setupData')
+        .snapshots();
+
+    // Combine both documents in real-time
+    return Rx.combineLatest2(
+      userDocStream,
+      setupDocStream,
+          (DocumentSnapshot userDoc, DocumentSnapshot setupDoc) {
+        if (userDoc.exists && setupDoc.exists) {
+          return UserModel.fromFirestore(userDoc, setupDoc.data() as Map<String, dynamic>);
+        }
+        return null;
+      },
+    );
+  }
+
+
+
   Future<List<UserModel>> fetchAllUsers() async {
     final querySnapshot = await _db.collection("users").get();
 
@@ -62,7 +91,9 @@ class UserProfileRepository {
             .get();
 
         final setupData = setupDoc.data() ?? {};
-        users.add(UserModel.fromFirestore(doc, setupData));
+        users.add(
+            UserModel.fromFirestore(doc, setupData)
+        );
       } catch (e) {
         print("Error parsing user ${doc.id}: $e");
       }
@@ -100,30 +131,143 @@ class UserProfileRepository {
     return users;
   }
 
+
+  // Future<List<UserModel>> fetchUsersByTag(String tag) async {
+  //   final snapshot = await _db
+  //       .collection("users")
+  //       .where("tag", isEqualTo: tag)
+  //       .get();
+  //
+  //   List<UserModel> users = [];
+  //   for (var doc in snapshot.docs) {
+  //     try {
+  //       final setupDoc = await _db
+  //           .collection("users")
+  //           .doc(doc.id)
+  //           .collection("profile_user")
+  //           .doc("setupData")
+  //           .get();
+  //
+  //       final setupData = setupDoc.data() ?? {};
+  //       users.add(UserModel.fromFirestore(doc, setupData));
+  //     } catch (e) {
+  //       print("Error parsing user ${doc.id}: $e");
+  //     }
+  //   }
+  //   return users;
+  // }
+
+  // Future<List<UserModel>> fetchUsersByTag(String tag) async {
+  //   final List<UserModel> users = [];
+  //
+  //   try {
+  //     // Step 1: Get all users with tag=user
+  //     final rootSnapshot = await _db
+  //         .collection("users")
+  //         .where("tag", isEqualTo: tag)
+  //         .get();
+  //
+  //     // Step 2: Loop through each user
+  //     for (var rootDoc in rootSnapshot.docs) {
+  //       final userId = rootDoc.id;
+  //       final rootData = rootDoc.data();
+  //
+  //       print("⚠️ Problem user rootData for $userId: $rootData");
+  //
+  //       try {
+  //         // Step 3: Fetch nested setupData if exists
+  //         final setupDoc = await _db
+  //             .collection("users")
+  //             .doc(userId)
+  //             .collection("profile_user")
+  //             .doc("setupData")
+  //             .get();
+  //
+  //         final setupData = setupDoc.exists ? setupDoc.data() ?? {} : {};
+  //
+  //         // Step 4: Clean suspicious map-type fields before parsing
+  //         if (rootData['displayName'] is Map) rootData['displayName'] = '';
+  //         if (rootData['name'] is Map) rootData['name'] = '';
+  //         if (rootData['email'] is Map) rootData['email'] = '';
+  //         if (rootData['avatarUrl'] is Map) rootData['avatarUrl'] = '';
+  //
+  //         // Step 5: Build user model safely
+  //         final user = UserModel.fromFirestore(rootDoc, setupData);
+  //         users.add(user);
+  //       } catch (e) {
+  //         print("❌ Error building UserModel for $userId: $e");
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print("🔥 Error fetching users by tag '$tag': $e");
+  //   }
+  //
+  //   return users;
+  // }
+
   Future<List<UserModel>> fetchUsersByTag(String tag) async {
-    final snapshot = await _db
-        .collection("users")
-        .where("tag", isEqualTo: tag)
-        .get();
+    final List<UserModel> users = [];
 
-    List<UserModel> users = [];
-    for (var doc in snapshot.docs) {
-      try {
-        final setupDoc = await _db
-            .collection("users")
-            .doc(doc.id)
-            .collection("profile_user")
-            .doc("setupData")
-            .get();
+    try {
+      // Fetch users with tag field equal to provided value
+      final rootSnapshot = await _db
+          .collection("users")
+          .where("tag", isEqualTo: tag)
+          .get();
 
-        final setupData = setupDoc.data() ?? {};
-        users.add(UserModel.fromFirestore(doc, setupData));
-      } catch (e) {
-        print("Error parsing user ${doc.id}: $e");
+      for (var rootDoc in rootSnapshot.docs) {
+        final userId = rootDoc.id;
+        final rootData = rootDoc.data();
+
+        print("⚠️ Raw user rootData for $userId: $rootData");
+
+        try {
+          // Fetch the setupData document under /users/{userId}/profile_user/setupData
+          final setupDoc = await _db
+              .collection("users")
+              .doc(userId)
+              .collection("profile_user")
+              .doc("setupData")
+              .get();
+
+          // ✅ Safe typed cast to Map<String, dynamic>
+          final setupData = setupDoc.exists
+              ? Map<String, dynamic>.from(setupDoc.data() ?? {})
+              : <String, dynamic>{};
+
+          // ✅ Safely sanitize inconsistent fields
+          final sanitizedRootData = Map<String, dynamic>.from(rootData);
+
+          if (sanitizedRootData['displayName'] is Map) {
+            sanitizedRootData['displayName'] = '';
+          }
+          if (sanitizedRootData['name'] is Map) {
+            sanitizedRootData['name'] = '';
+          }
+          if (sanitizedRootData['email'] is Map) {
+            sanitizedRootData['email'] = '';
+          }
+          if (sanitizedRootData['avatarUrl'] is Map) {
+            sanitizedRootData['avatarUrl'] = '';
+          }
+
+          // ✅ Construct UserModel
+          final user = UserModel.fromFirestore(rootDoc, setupData);
+          users.add(user);
+        } catch (e, st) {
+          print("❌ Error building UserModel for $userId: $e");
+          print(st);
+        }
       }
+    } catch (e) {
+      print("🔥 Error fetching users by tag '$tag': $e");
     }
+
+    print("✅ Successfully fetched ${users.length} users with tag '$tag'");
     return users;
   }
+
+
 
   Future<List<AgentFieldData>> fetchAllAgents() async {
     final snapshot = await _db

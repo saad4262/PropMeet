@@ -63,6 +63,7 @@ class HomeView extends StatelessWidget {
                                   'J',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
+                                    color: AppColors.white,
                                     fontSize: Responsive.fontSize(25),
                                   ),
                                 ),

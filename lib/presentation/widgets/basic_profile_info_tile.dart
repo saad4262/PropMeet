@@ -23,7 +23,6 @@ class BasicProfileInfoTile extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-
               Text(
                 label,
                 style: TextStyle(
@@ -32,13 +31,17 @@ class BasicProfileInfoTile extends StatelessWidget {
                   fontSize: Responsive.fontSize(3.5),
                 ),
               ),
-
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: Responsive.fontSize(3.5),
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
+              const SizedBox(width: 8),
+             Flexible(
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: Responsive.fontSize(3.5),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
                 ),
               ),
             ],

@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
- 
+
 class AgentFieldData {
   final String apartmentAndUnit;
   final String? createdAt;
   final String averageRating;
   final String bio;
   final String clientReviews;
+  final Map<String, dynamic>? location;
   final String firstName;
   final String lastName;
   final String phoneNumber;
@@ -34,6 +35,7 @@ class AgentFieldData {
   final List<String> disliked;
 
   AgentFieldData({
+    this.location,
     required this.apartmentAndUnit,
     this.createdAt,
     required this.averageRating,
@@ -64,9 +66,10 @@ class AgentFieldData {
     this.disliked = const [],
   });
 
-
-  factory AgentFieldData.fromFirestore(Map<String, dynamic> rootData,
-      Map<String, dynamic> map,) {
+  factory AgentFieldData.fromFirestore(
+      Map<String, dynamic> rootData,
+      Map<String, dynamic> map,
+      ) {
     final setupData = map['fieldData'] ?? {};
     final selections1 = map['selectionsOption1'] ?? {};
     final selections2 = map['selectionsOption2'] ?? {};
@@ -78,13 +81,23 @@ class AgentFieldData {
       formattedDate = DateFormat('MM/dd/yyyy').format(dateTime);
     }
 
-    // ✅ Fix function for Firebase URLs
+    // ✅ Fix Firebase image URLs
     String _fixFirebaseImageUrl(String? url) {
       if (url == null || url.isEmpty) return '';
       if (url.contains('.firebasestorage.app')) {
         return url.replaceAll('.firebasestorage.app', '.appspot.com');
       }
       return url;
+    }
+
+    // ✅ Handle location properly BEFORE constructor
+    dynamic loc = setupData['Location'] ?? map['location'] ?? rootData['location'];
+
+    Map<String, dynamic>? locationMap;
+    if (loc is String) {
+      locationMap = {"address": loc};
+    } else if (loc is Map) {
+      locationMap = Map<String, dynamic>.from(loc);
     }
 
     return AgentFieldData(
@@ -98,46 +111,44 @@ class AgentFieldData {
       phoneNumber: setupData['Phone Number']?.toString() ?? '',
       professionalTitle: setupData['Professional Title']?.toString() ?? '',
       yearsOfExperience: setupData['Years of Experience']?.toString() ?? '',
-      medianDaysOnMarket: setupData['What was your median days on market (time advertised before sale)?']
-          ?.toString() ?? '',
+      medianDaysOnMarket:
+      setupData['What was your median days on market (time advertised before sale)?']
+          ?.toString() ??
+          '',
       ruralAcreage: setupData['Rural / Acreage']?.toString() ?? '',
       townhouse: setupData['Townhouse']?.toString() ?? '',
       house: setupData['House']?.toString() ?? '',
       land: setupData['Land']?.toString() ?? '',
       luxuryHomes: setupData['Luxury Homes']?.toString() ?? '',
       offThePlan: setupData['Off-the-Plan']?.toString() ?? '',
-      managedProperties: setupData['How many properties do you currently manage under rental agreements?']
-          ?.toString() ?? '',
-      soldProperties: setupData['How many properties have you sold in the last 12 months?']
-          ?.toString() ?? '',
-
-      // ✅ Apply fix here
-      //profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString()),
-      profileImage: _fixFirebaseImageUrl(map['profile']?['profileImage'] ?? ''),
-
-      // profileImage: _fixFirebaseImageUrl(setupData['profileImage']?.toString())
-      //     .isNotEmpty
-      //     ? _fixFirebaseImageUrl(setupData['profileImage']?.toString())
-      //     : "assets/images/user4.png",
-
-
-      feeStructure: selections1['Fee Structure']?.toString() ?? '',
-      feesNegotiable: selections2['Are your fees negotiable?']?.toString() ??
+      managedProperties:
+      setupData['How many properties do you currently manage under rental agreements?']
+          ?.toString() ??
           '',
-      serviceProvided: setSelection['What service do you provide to property owners?']
-          ?.toString() ?? '',
-      toggleLeaseRenewal: rootData['toggleLeaseRenewal'] ?? false,
-      toggleNegotiable: rootData['toggleNegotiable'] ?? false,
-
-      swipeCount: rootData['swipes']?['count'] ?? 0,
-      liked: rootData['swipes']?['liked'] != null
-          ? List<String>.from(rootData['swipes']['liked'])
+      soldProperties:
+      setupData['How many properties have you sold in the last 12 months?']
+          ?.toString() ??
+          '',
+      profileImage: _fixFirebaseImageUrl(map['profile']?['profileImage'] ?? ''),
+      location: locationMap, // ✅ use parsed map here
+      feeStructure: selections1['Fee Structure']?.toString() ?? '',
+      feesNegotiable: selections2['Are your fees negotiable?']?.toString() ?? '',
+      serviceProvided:
+      setSelection['What service do you provide to property owners?']
+          ?.toString() ??
+          '',
+      toggleLeaseRenewal: map['toggleLeaseRenewal'] ?? false,
+      toggleNegotiable: map['toggleNegotiable'] ?? false,
+      swipeCount: map['swipes']?['count'] ?? 0,
+      liked: map['swipes']?['liked'] != null
+          ? List<String>.from(map['swipes']['liked'])
           : [],
-      disliked: rootData['swipes']?['disliked'] != null
-          ? List<String>.from(rootData['swipes']['disliked'])
+      disliked: map['swipes']?['disliked'] != null
+          ? List<String>.from(map['swipes']['disliked'])
           : [],
     );
   }
+
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -151,34 +162,33 @@ class AgentFieldData {
         "Phone Number": phoneNumber,
         "Professional Title": professionalTitle,
         "Years of Experience": yearsOfExperience,
-        "What was your median days on market (time advertised before sale)?": medianDaysOnMarket,
+        "What was your median days on market (time advertised before sale)?":
+        medianDaysOnMarket,
         "Rural / Acreage": ruralAcreage,
         "Townhouse": townhouse,
         "House": house,
         "Land": land,
         "Luxury Homes": luxuryHomes,
         "Off-the-Plan": offThePlan,
-        "How many properties do you currently manage under rental agreements?": managedProperties,
-        "How many properties have you sold in the last 12 months?": soldProperties,
+        "How many properties do you currently manage under rental agreements?":
+        managedProperties,
+        "How many properties have you sold in the last 12 months?":
+        soldProperties,
         "profileImage": profileImage,
+        "Location": location ?? {}, // ✅ store map now
       },
-      "selectionsOption1": {
-        "Fee Structure": feeStructure,
-      },
-      "selectionsOption2": {
-        "Are your fees negotiable?": feesNegotiable,
-      },
+      "selectionsOption1": {"Fee Structure": feeStructure},
+      "selectionsOption2": {"Are your fees negotiable?": feesNegotiable},
       "setSelection": {
         "What service do you provide to property owners?": serviceProvided,
       },
       "toggleLeaseRenewal": toggleLeaseRenewal,
       "toggleNegotiable": toggleNegotiable,
-
       "swipes": {
         "count": swipeCount,
         "liked": liked,
         "disliked": disliked,
-      }
+      },
     };
   }
 
@@ -194,6 +204,7 @@ class AgentFieldData {
     String? managing,
     String? serviceProvided,
     String? feeStructure,
+    Map<String, dynamic>? location,
   }) {
     return AgentFieldData(
       apartmentAndUnit: apartmentAndUnit,
@@ -224,6 +235,7 @@ class AgentFieldData {
       swipeCount: swipeCount,
       liked: liked,
       disliked: disliked,
+      location: location ?? this.location, // ✅ handled in copy
     );
   }
 }

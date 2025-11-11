@@ -924,6 +924,7 @@ class ProfileSetupScreen extends StatelessWidget {
 
                     return Text(
                       "Selected: ${controller.selectedPlaceDetails.value?.address}\n",
+                      maxLines: 1, overflow: TextOverflow.ellipsis,
                       // "Lat: ${controller.selectedLat.value}, Lng: ${controller.selectedLng.value}",
                       style: const TextStyle(
                         fontSize: 16,

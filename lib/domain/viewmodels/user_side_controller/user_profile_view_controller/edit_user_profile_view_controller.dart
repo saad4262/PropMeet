@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../../../data/repositories/user_side_repository/user_profile_repo.dart';
 import '../../../../model/user_model/property_detail_model.dart';
 import '../../../../model/user_model/user_model.dart';
@@ -132,7 +133,7 @@ class EditUserProfileViewController extends GetxController {
     profile.value = await _repository.fetchUserProfile();
 
     if (profile.value != null) {
-      nameController.text = profile.value!.name ?? "";
+      nameController.text = profile.value!.displayName ?? "";
       emailController.text = profile.value!.email ?? "";
       locationController.text = profile.value!.location ?? "";
 
@@ -173,7 +174,7 @@ class EditUserProfileViewController extends GetxController {
     };
 
     final updatedUser = profile.value!.copyWith(
-      name: nameController.text,
+      displayName: nameController.text,
       email: emailController.text,
       location: locationController.text,
       selections: existingSelections,

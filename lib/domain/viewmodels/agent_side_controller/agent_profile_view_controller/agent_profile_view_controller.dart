@@ -22,6 +22,7 @@ class AgentProfileViewController extends GetxController{
       isLoading.value = true;
       final fetchedProfile = await _repository.fetchAgentProfile();
       profile.value = fetchedProfile;
+      print("📍 Location field: ${profile.value?.location}");
     } catch (e) {
       print("Error fetching profile: $e");
     } finally {

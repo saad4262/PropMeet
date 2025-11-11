@@ -80,8 +80,8 @@ class CustomUserProfileCard extends StatelessWidget {
                           }
                           final user = controller.profile.value!;
                           final String initial =
-                              (user.name != null && user.name!.isNotEmpty)
-                                  ? user.name![0].toUpperCase()
+                              (user.displayName != null && user.displayName!.isNotEmpty)
+                                  ? user.displayName![0].toUpperCase()
                                   : (user.email.isNotEmpty
                                       ? user.email[0].toUpperCase()
                                       : "?");

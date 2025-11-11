@@ -284,6 +284,37 @@ class AgentProfileCard extends StatelessWidget {
               }),
             ],
           ),
+
+          // Obx(() {
+          //   if (controller.isLoading.value) {
+          //     return const Center(child: CircularProgressIndicator());
+          //   }
+          //
+          //   final location = controller.profile.value?.location;
+          //
+          //   String address = "N/A";
+          //
+          //   // ✅ Handle both Map and String safely
+          //   if (location != null) {
+          //     if (location is Map<String, dynamic> && location.containsKey('address')) {
+          //       address = location['address'] ?? "N/A";
+          //     } else if (location is String) {
+          //       address = location as String;
+          //     }
+          //   }
+          //
+          //   return Text(
+          //     address,
+          //     style: TextStyle(
+          //       fontSize: Responsive.fontSize(2),
+          //       fontWeight: FontWeight.w400,
+          //       color: AppColors.grey,
+          //     ),
+          //   );
+          // })
+
+
+
         ],
       ),
     );

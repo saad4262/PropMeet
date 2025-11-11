@@ -99,12 +99,15 @@ class AgentCardWidget extends StatelessWidget {
                                                                     ),
                                                                     const SizedBox(width: 4),
                                                                     Text(
-                                                                        user["location"] ?? "--",
+                                                                        _truncateLocation(user["location"] ?? "--"),
+                                                                        softWrap: true,
+                                                                        overflow: TextOverflow.ellipsis,
                                                                         style: TextStyle(
                                                                             color: AppColors.white,
                                                                             fontSize: Responsive.fontSize(3.5),
                                                                         ),
                                                                     ),
+
                                                                 ],
                                                             ),
                                                         ],
@@ -187,7 +190,7 @@ class AgentCardWidget extends StatelessWidget {
         return Container(
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.grey // background color
+                color: AppColors.blueMain,
             ),
             alignment: Alignment.center,
             child: Text(
@@ -227,3 +230,8 @@ class AgentCardWidget extends StatelessWidget {
         );
     }
 }
+String _truncateLocation(String text, {int maxLength = 20}) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
